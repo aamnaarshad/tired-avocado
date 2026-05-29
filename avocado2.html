@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☆ avocado's corner ☆</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --win-bg:#c0c0c0;--win-dark:#808080;--win-darker:#404040;--win-light:#ffffff;
+    --win-title:#2d5a27;--win-title-end:#4a8a3f;
+    --desktop-bg:#1a3d17;
+    --accent-pink:#ff69b4;--accent-yellow:#ffff00;--accent-cyan:#00ffff;--accent-lime:#a8e063;
+    --pixel-font:'Press Start 2P',monospace;--vt-font:'VT323',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background-color:var(--desktop-bg);
+    background-image:
+      repeating-linear-gradient(0deg,transparent,transparent 15px,rgba(0,0,0,0.05) 15px,rgba(0,0,0,0.05) 16px),
+      repeating-linear-gradient(90deg,transparent,transparent 15px,rgba(0,0,0,0.05) 15px,rgba(0,0,0,0.05) 16px);
+    min-height:100vh;font-family:var(--pixel-font);font-size:10px;
+    padding:8px 8px 60px 8px;overflow-x:hidden;
+  }
+  /* DESKTOP ICONS */
+  .desktop-icons{position:fixed;left:8px;top:8px;display:flex;flex-direction:column;gap:12px;z-index:10;}
+  .desk-icon{display:flex;flex-direction:column;align-items:center;gap:3px;width:72px;cursor:pointer;text-align:center;}
+  .desk-icon .ico{font-size:26px;filter:drop-shadow(1px 1px 0 #000);}
+  .desk-icon span{font-family:var(--pixel-font);font-size:7px;color:white;text-shadow:1px 1px 0 #000,-1px 0 0 #000,0 -1px 0 #000;line-height:1.3;}
+  .desk-icon:hover span{background:var(--win-title);color:white;}
+  /* TASKBAR */
+  .taskbar{position:fixed;bottom:0;left:0;right:0;height:36px;background:var(--win-bg);border-top:2px solid var(--win-light);display:flex;align-items:center;padding:2px 4px;gap:4px;z-index:9999;box-shadow:0 -1px 0 var(--win-dark);}
+  .start-btn{background:var(--win-bg);border:2px solid;border-color:var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);padding:3px 8px;font-family:var(--pixel-font);font-size:9px;font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:5px;color:#000;}
+  .start-btn:active{border-color:var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);}
+  .tbdiv{width:2px;background:var(--win-dark);height:26px;margin:0 2px;border-right:1px solid var(--win-light);}
+  .taskbar-btn{background:var(--win-bg);border:2px solid;border-color:var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);padding:2px 8px;font-family:var(--pixel-font);font-size:7px;cursor:pointer;color:#000;display:flex;align-items:center;gap:4px;height:26px;}
+  .clock-area{margin-left:auto;border:2px inset var(--win-dark);background:var(--win-bg);padding:3px 8px;font-family:var(--vt-font);font-size:16px;color:#000;min-width:70px;text-align:center;}
+  /* WINDOWS */
+  .win-window{background:var(--win-bg);border:2px solid;border-color:var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);box-shadow:2px 2px 0 var(--win-darker);margin-bottom:8px;}
+  .win-titlebar{background:linear-gradient(90deg,var(--win-title),var(--win-title-end));padding:3px 5px;display:flex;align-items:center;justify-content:space-between;user-select:none;}
+  .win-titlebar-left{display:flex;align-items:center;gap:5px;color:white;font-family:var(--pixel-font);font-size:8px;font-weight:bold;}
+  .win-controls{display:flex;gap:2px;}
+  .win-btn{width:16px;height:14px;background:var(--win-bg);border:1px solid;border-color:var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:monospace;line-height:1;color:#000;}
+  .win-btn:active{border-color:var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);}
+  .win-menubar{background:var(--win-bg);border-bottom:1px solid var(--win-dark);padding:2px 4px;display:flex;gap:2px;}
+  .win-menu-item{font-family:var(--pixel-font);font-size:7px;padding:2px 6px;cursor:pointer;color:#000;}
+  .win-menu-item:hover{background:var(--win-title);color:white;}
+  .win-content{padding:8px;background:var(--win-bg);overflow:auto;}
+  .win-statusbar{background:var(--win-bg);border-top:1px solid var(--win-dark);padding:2px 8px;font-family:var(--pixel-font);font-size:7px;color:#444;display:flex;gap:8px;}
+  .statusbar-panel{border:1px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);padding:1px 6px;flex:1;}
+  .inset-box{border:2px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);background:white;padding:6px;}
+  .raised-box{border:2px solid;border-color:var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);background:var(--win-bg);padding:4px;}
+  /* MARQUEE */
+  .marquee-bar{background:#1a3d17;border:2px inset var(--win-dark);padding:4px 0;overflow:hidden;white-space:nowrap;}
+  .marquee-inner{display:inline-block;animation:marquee 20s linear infinite;font-family:var(--vt-font);font-size:18px;color:var(--accent-lime);text-shadow:0 0 8px var(--accent-lime);padding-left:100%;}
+  @keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
+  /* LAYOUT */
+  .page-layout{margin-left:90px;display:grid;grid-template-columns:220px 1fr 220px;gap:8px;max-width:1200px;}
+  .header-window{margin-left:90px;margin-bottom:8px;}
+  /* HEADER */
+  .header-content{background:#0a1a08;padding:12px;text-align:center;border:2px inset var(--win-dark);position:relative;overflow:hidden;}
+  .header-content::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,255,0,0.03) 3px,rgba(0,255,0,0.03) 4px);pointer-events:none;}
+  .site-title{font-family:var(--pixel-font);font-size:16px;color:var(--accent-lime);text-shadow:0 0 10px var(--accent-lime),2px 2px 0 #001100;letter-spacing:2px;animation:glitch 4s infinite;}
+  .site-title span{color:var(--accent-pink);text-shadow:0 0 10px var(--accent-pink);}
+  @keyframes glitch{0%,90%,100%{transform:translateX(0);}92%{transform:translateX(-2px);filter:hue-rotate(60deg);}94%{transform:translateX(2px);}96%{transform:translateX(0);}}
+  .site-sub{font-family:var(--vt-font);font-size:22px;color:#c8e86a;margin-top:4px;animation:blink 1.4s step-end infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+  .header-stars{font-size:20px;margin-top:4px;display:inline-block;animation:spread 4s ease-in-out infinite;}
+  @keyframes spread{0%,100%{letter-spacing:2px;}50%{letter-spacing:10px;}}
+  .visitor-badge{display:inline-block;margin-top:8px;background:#060f05;border:2px solid var(--accent-lime);color:var(--accent-lime);font-family:var(--vt-font);font-size:18px;padding:2px 12px;text-shadow:0 0 6px var(--accent-lime);}
+  /* AVOCADO SVG */
+  .avatar-frame{width:72px;height:72px;border:3px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);background:#c8e86a;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .about-text{font-family:var(--vt-font);font-size:16px;line-height:1.5;color:#000;}
+  /* NAV */
+  .nav-tree{list-style:none;}
+  .nav-tree li{font-family:var(--pixel-font);font-size:7px;padding:5px 4px;cursor:pointer;display:flex;align-items:center;gap:5px;color:#000;border:1px solid transparent;text-decoration:none;}
+  .nav-tree li:hover,.nav-tree a:hover li{background:var(--win-title);color:white;border:1px dotted var(--win-title-end);}
+  .nav-tree li.active{background:var(--win-title);color:white;}
+  .nav-tree a{text-decoration:none;display:block;}
+  .nav-sub li{padding-left:18px;}
+  /* UPDATE LOG */
+  .update-entry{border-bottom:1px dashed var(--win-dark);padding:5px 0;margin-bottom:4px;}
+  .update-date{font-family:var(--pixel-font);font-size:7px;color:var(--win-title);display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+  .update-text{font-family:var(--vt-font);font-size:16px;color:#222;line-height:1.4;padding-left:8px;}
+  /* BLINKIES */
+  .blinkies-area{display:flex;flex-wrap:wrap;gap:4px;}
+  .blinky{height:20px;display:flex;align-items:center;padding:0 6px;font-family:var(--pixel-font);font-size:6px;border:1px solid;cursor:default;white-space:nowrap;animation:bpulse 1.5s step-end infinite;}
+  @keyframes bpulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+  .stamp{width:80px;height:50px;border:3px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--pixel-font);font-size:6px;text-align:center;gap:2px;cursor:pointer;padding:3px;line-height:1.3;}
+  .stamp:hover{filter:brightness(1.2);transform:scale(1.05);}
+  .stamp .si{font-size:20px;}
+  /* PLAYER */
+  .player-display{background:#001100;border:2px inset #006600;padding:6px 8px;margin-bottom:6px;font-family:var(--vt-font);font-size:18px;color:#00ff44;text-shadow:0 0 8px #00ff44;display:flex;justify-content:space-between;}
+  .track-scroll{overflow:hidden;flex:1;white-space:nowrap;}
+  .track-scroll span{display:inline-block;animation:marquee 8s linear infinite;padding-left:100%;}
+  .player-controls{display:flex;gap:4px;justify-content:center;}
+  .p-btn{background:var(--win-bg);border:2px solid;border-color:var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);width:32px;height:24px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;color:#000;}
+  .p-btn:active{border-color:var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);}
+  .eq-bars{display:flex;gap:2px;align-items:flex-end;height:20px;padding:0 4px;}
+  .eq-bar{width:3px;background:#00ff44;box-shadow:0 0 4px #00ff44;animation:eqdance var(--d,.4s) ease-in-out infinite alternate;}
+  @keyframes eqdance{0%{height:2px;}100%{height:var(--h,14px);}}
+  /* INTERESTS */
+  .interest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+  .interest-card{background:white;border:2px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);padding:4px;text-align:center;cursor:pointer;}
+  .interest-card:hover{background:var(--win-title);color:white;}
+  .interest-card .ic-ico{font-size:20px;display:block;}
+  .interest-card .ic-label{font-family:var(--pixel-font);font-size:6px;margin-top:3px;display:block;line-height:1.4;}
+  /* GUESTBOOK */
+  .gb-list{max-height:220px;overflow-y:auto;margin-bottom:8px;}
+  .gb-entry{background:white;border:2px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);padding:6px;margin-bottom:5px;}
+  .gb-name{font-family:var(--pixel-font);font-size:7px;color:var(--win-title);display:flex;align-items:center;gap:4px;}
+  .gb-date{font-family:var(--pixel-font);font-size:6px;color:#888;margin-left:auto;}
+  .gb-msg{font-family:var(--vt-font);font-size:17px;margin-top:3px;color:#222;padding-left:6px;}
+  /* STATS */
+  .progress-container{background:white;border:2px inset var(--win-dark);height:16px;position:relative;overflow:hidden;margin-bottom:8px;}
+  .progress-fill{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:3px;transition:width 0.3s;}
+  .progress-label{font-family:var(--pixel-font);font-size:7px;color:white;}
+  /* STATS EDIT MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;}
+  .modal-overlay.hidden{display:none;}
+  .stat-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .stat-row label{font-family:var(--pixel-font);font-size:7px;min-width:90px;color:#000;}
+  .stat-row input[type=range]{flex:1;accent-color:var(--win-title);}
+  .stat-row .val{font-family:var(--pixel-font);font-size:7px;min-width:28px;color:#000;}
+  .mood-selector{display:flex;gap:4px;flex-wrap:wrap;}
+  .mood-opt{font-size:18px;cursor:pointer;padding:2px;border:2px solid transparent;border-radius:2px;}
+  .mood-opt.selected,.mood-opt:hover{border-color:var(--win-title);background:#e0f0dd;}
+  /* PIXEL HR */
+  .pixel-hr{border:none;border-top:2px solid var(--win-dark);border-bottom:1px solid var(--win-light);height:3px;margin:6px 0;}
+  .section-label{font-family:var(--pixel-font);font-size:7px;color:var(--win-title);margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+  .scrollable{max-height:200px;overflow-y:auto;}
+  .counter{background:#111;color:#44ff66;font-family:var(--vt-font);font-size:28px;padding:4px 12px;border:2px inset #333;text-shadow:0 0 8px #44ff66;letter-spacing:4px;display:inline-block;}
+  .win-form-btn{background:var(--win-bg);border:2px solid;border-color:var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);padding:4px 12px;font-family:var(--pixel-font);font-size:7px;cursor:pointer;color:#000;}
+  .win-form-btn:active{border-color:var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);}
+  .win-form-btn.primary{background:#2d5a27;color:white;border-color:#4a8a3f var(--win-darker) var(--win-darker) #4a8a3f;}
+  .win-form-input{background:white;border:2px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);padding:3px 6px;font-family:var(--vt-font);font-size:16px;width:100%;color:#000;}
+  .win-form-input:focus{outline:1px dotted #000;}
+  .hidden{display:none !important;}
+  .wip-badge{background:#ff0;color:#000;font-family:var(--pixel-font);font-size:6px;padding:1px 4px;border:1px solid #000;animation:blink .8s step-end infinite;}
+  .new-badge{background:#ff0;color:#000;font-family:var(--pixel-font);font-size:6px;padding:1px 4px;border:1px solid #000;}
+  .waving{display:inline-block;animation:wave 1.5s ease-in-out infinite;transform-origin:bottom center;}
+  @keyframes wave{0%,100%{transform:rotate(0deg);}25%{transform:rotate(20deg);}75%{transform:rotate(-20deg);}}
+  .rainbow-text{background:linear-gradient(90deg,#88cc44,#ff69b4,#88cc44);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--pixel-font);font-size:8px;animation:rshift 2s linear infinite;background-size:200%;}
+  @keyframes rshift{0%{background-position:0%;}100%{background-position:200%;}}
+  .tree-item{display:flex;align-items:center;gap:4px;padding:3px 4px;font-family:var(--pixel-font);font-size:7px;cursor:pointer;color:#000;}
+  .tree-item:hover{background:var(--win-title);color:white;}
+  .tree-item a{color:var(--win-title);text-decoration:underline;}
+  .tree-item:hover a{color:white;}
+  .deco-star{position:fixed;pointer-events:none;font-size:14px;animation:fstar 4s ease-in-out infinite;z-index:0;opacity:0.5;}
+  @keyframes fstar{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-10px) rotate(180deg);}}
+  a{color:var(--win-title);text-decoration:underline;}
+  a:hover{color:var(--accent-pink);}
+  ::-webkit-scrollbar{width:16px;height:16px;}
+  ::-webkit-scrollbar-track{background:var(--win-bg);}
+  ::-webkit-scrollbar-thumb{background:var(--win-bg);border:2px solid;border-color:var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);}
+  .under-con{background:repeating-linear-gradient(45deg,#ffff00,#ffff00 10px,#000 10px,#000 20px);color:black;font-family:var(--pixel-font);font-size:8px;text-align:center;padding:6px;border:3px solid #000;}
+  .under-con span{background:#ffff00;padding:2px 8px;}
+  .toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--win-title);color:white;font-family:var(--pixel-font);font-size:8px;padding:6px 16px;border:2px solid var(--win-light);z-index:99999;animation:toast-in .2s ease;box-shadow:2px 2px 0 var(--win-darker);}
+  @keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  /* Dialog */
+  .dialog-box{position:fixed;top:100px;right:20px;width:270px;z-index:999;}
+  .dialog-content{background:var(--win-bg);padding:12px;text-align:center;}
+  .dialog-ico{font-size:32px;margin-bottom:6px;}
+  .dialog-text{font-family:var(--pixel-font);font-size:8px;line-height:1.8;margin-bottom:10px;color:#000;}
+  .dialog-btns{display:flex;gap:6px;justify-content:center;}
+  .dialog-btn{background:var(--win-bg);border:2px solid;border-color:var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);padding:3px 16px;font-family:var(--pixel-font);font-size:8px;cursor:pointer;min-width:60px;color:#000;}
+  .dialog-btn:active{border-color:var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);}
+</style>
+</head>
+<body>
+
+<!-- DECO -->
+<div class="deco-star" style="left:15%;top:22%;animation-delay:0s;">🌿</div>
+<div class="deco-star" style="left:83%;top:38%;animation-delay:1s;">✨</div>
+<div class="deco-star" style="left:71%;top:14%;animation-delay:2s;">🥑</div>
+<div class="deco-star" style="left:32%;top:58%;animation-delay:.5s;">🌸</div>
+
+<!-- DESKTOP ICONS -->
+<div class="desktop-icons">
+  <div class="desk-icon" onclick="scrollTo('#home')"><div class="ico">🖥️</div><span>My Computer</span></div>
+  <div class="desk-icon" onclick="scrollTo('#about')"><div class="ico">📁</div><span>About Me</span></div>
+  <div class="desk-icon" onclick="scrollTo('#guestbook')"><div class="ico">📬</div><span>Guestbook</span></div>
+  <div class="desk-icon" onclick="scrollTo('#interests')"><div class="ico">💖</div><span>Interests</span></div>
+  <div class="desk-icon" onclick="scrollTo('#stats')"><div class="ico">📊</div><span>My Stats</span></div>
+  <div class="desk-icon" onclick="scrollTo('#links')"><div class="ico">🔗</div><span>Cool Links</span></div>
+  <div class="desk-icon" onclick="scrollTo('#music')"><div class="ico">🎵</div><span>Music</span></div>
+</div>
+
+<!-- WELCOME POPUP -->
+<div class="dialog-box" id="welcomeDialog">
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🥑</span><span>welcome!!</span></div>
+      <div class="win-controls"><button class="win-btn" onclick="document.getElementById('welcomeDialog').classList.add('hidden')">✕</button></div>
+    </div>
+    <div class="dialog-content">
+      <div class="dialog-ico">🥑</div>
+      <div class="dialog-text">hi!! welcome to my<br>little corner 🌿<br><br>you are visitor<br>#<span id="dialogVisitor">-</span>!!</div>
+      <div class="dialog-btns">
+        <button class="dialog-btn" onclick="document.getElementById('welcomeDialog').classList.add('hidden')">OK!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS EDIT MODAL -->
+<div class="modal-overlay hidden" id="statsModal">
+  <div class="win-window" style="width:340px;">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🔒</span><span>Edit My Stats</span></div>
+      <div class="win-controls"><button class="win-btn" onclick="closeStatsModal()">✕</button></div>
+    </div>
+    <div class="win-content" id="statsModalContent">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div id="home" class="header-window win-window">
+  <div class="win-titlebar">
+    <div class="win-titlebar-left"><span>🥑</span><span>avocado's corner — Internet Explorer</span></div>
+    <div class="win-controls">
+      <button class="win-btn">_</button><button class="win-btn">□</button><button class="win-btn">✕</button>
+    </div>
+  </div>
+  <div class="win-menubar">
+    <span class="win-menu-item">File</span><span class="win-menu-item">Edit</span>
+    <span class="win-menu-item">View</span><span class="win-menu-item">Favorites</span>
+    <span class="win-menu-item">Help</span>
+  </div>
+  <div class="win-content" style="padding:0;">
+    <div class="header-content">
+      <div class="header-stars">🥑🌿✨🌸✨🌿🥑</div>
+      <div class="site-title">☆ <span>avocado's</span> corner ☆</div>
+      <div class="site-sub">▶ welcome to my little world ◀</div>
+      <div style="margin-top:6px;font-family:var(--vt-font);font-size:16px;color:#c8e86a;">
+        last updated: <span style="color:var(--accent-yellow);" id="lastUpdatedHeader">—</span>
+        &nbsp;|&nbsp; best viewed with: <span style="color:var(--accent-pink);">love ♡</span>
+      </div>
+      <div class="visitor-badge">VISITORS: <span id="visitorCount">...</span></div>
+    </div>
+  </div>
+  <div class="marquee-bar">
+    <div class="marquee-inner">
+      🥑 welcome to avocado's corner!! 🥑 &nbsp;&nbsp;&nbsp; 🎵 kpop&nbsp;girlie&nbsp;forever 🎵 &nbsp;&nbsp;&nbsp; 📺 currently&nbsp;catching&nbsp;up&nbsp;on&nbsp;kdramas &nbsp;&nbsp;&nbsp; 💤 professional&nbsp;napper &nbsp;&nbsp;&nbsp; ✨ thanks&nbsp;for&nbsp;visiting&nbsp;my&nbsp;little&nbsp;world ✨ &nbsp;&nbsp;&nbsp; 📖 reading&nbsp;manhwas&nbsp;at&nbsp;3am &nbsp;&nbsp;&nbsp; 🌿 me,&nbsp;myself,&nbsp;and&nbsp;my&nbsp;avocados 🌿 &nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="page-layout">
+
+<!-- ══ LEFT ══ -->
+<div>
+  <!-- Navigation -->
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📁</span><span>Navigation</span></div>
+      <div class="win-controls"><button class="win-btn">_</button></div>
+    </div>
+    <div class="win-content" style="padding:4px;">
+      <ul class="nav-tree">
+        <li class="active" onclick="scrollTo('#home')">🏠 home</li>
+        <li onclick="scrollTo('#about')">🥑 about me</li>
+        <li onclick="scrollTo('#diary')">📓 update log</li>
+        <li onclick="scrollTo('#interests')">💖 interests</li>
+        <li onclick="scrollTo('#music')">🎵 music player</li>
+        <li onclick="scrollTo('#stats')">📊 my stats</li>
+        <li onclick="scrollTo('#guestbook')">📬 guestbook</li>
+        <li onclick="scrollTo('#currently')">📺 currently...</li>
+        <li onclick="scrollTo('#links')">🔗 cool links</li>
+      </ul>
+    </div>
+    <div class="win-statusbar"><div class="statusbar-panel">9 sections</div></div>
+  </div>
+
+  <!-- WinAmp -->
+  <div id="music" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🎵</span><span>WinAmp 2.91</span></div>
+      <div class="win-controls"><button class="win-btn">_</button></div>
+    </div>
+    <div class="win-content" style="padding:4px;background:#111;">
+      <div class="player-display">
+        <div class="track-scroll"><span id="trackName">🎵 kpop playlist — shuffle mode &nbsp;&nbsp;&nbsp;</span></div>
+        <div class="eq-bars" id="eqBars"></div>
+      </div>
+      <div class="player-controls">
+        <button class="p-btn" onclick="prevTrack()">⏮</button>
+        <button class="p-btn" onclick="stopTrack()">⏹</button>
+        <button class="p-btn" id="playBtn" onclick="togglePlay()" style="background:#004400;color:#00ff00;">▶</button>
+        <button class="p-btn" onclick="togglePlay()">⏸</button>
+        <button class="p-btn" onclick="nextTrack()">⏭</button>
+      </div>
+      <div style="margin-top:6px;padding:4px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#888;margin-bottom:2px;">VOL</div>
+        <input type="range" min="0" max="100" value="75" style="width:100%;accent-color:#00ff44;height:8px;"/>
+      </div>
+      <div style="padding:0 4px 4px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin:4px 0 2px;">PLAYLIST:</div>
+        <div id="playlist" style="background:#001100;border:1px inset #004400;padding:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visitor Counter -->
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>👁️</span><span>Visitor Counter</span></div>
+    </div>
+    <div class="win-content" style="text-align:center;">
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:6px;color:#555;">YOU ARE VISITOR:</div>
+      <div class="counter" id="counterDisplay">...</div>
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-top:6px;color:#555;">since 05.29.2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CENTER ══ -->
+<div>
+  <!-- About Me -->
+  <div id="about" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🥑</span><span>About Me — README.txt</span></div>
+      <div class="win-controls">
+        <button class="win-btn">_</button><button class="win-btn">□</button><button class="win-btn">✕</button>
+      </div>
+    </div>
+    <div class="win-content">
+      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;">
+        <div class="avatar-frame">
+          <!-- CUTE AVOCADO SVG -->
+          <svg viewBox="0 0 64 72" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+            <!-- outer skin dark green -->
+            <ellipse cx="32" cy="42" rx="22" ry="26" fill="#2d5a27"/>
+            <!-- top bump -->
+            <ellipse cx="32" cy="18" rx="10" ry="12" fill="#2d5a27"/>
+            <!-- inner flesh -->
+            <ellipse cx="32" cy="44" rx="17" ry="21" fill="#c8e86a"/>
+            <ellipse cx="32" cy="18" rx="7" ry="9" fill="#c8e86a"/>
+            <!-- pit -->
+            <ellipse cx="32" cy="48" rx="8" ry="9" fill="#8B4513"/>
+            <ellipse cx="32" cy="48" rx="6" ry="7" fill="#a05c2a"/>
+            <ellipse cx="31" cy="46" rx="2" ry="2" fill="#c47a3a" opacity=".5"/>
+            <!-- eyes -->
+            <circle cx="25" cy="33" r="2.5" fill="#1a1a0a"/>
+            <circle cx="39" cy="33" r="2.5" fill="#1a1a0a"/>
+            <circle cx="25.8" cy="32.2" r=".9" fill="white"/>
+            <circle cx="39.8" cy="32.2" r=".9" fill="white"/>
+            <!-- blush -->
+            <ellipse cx="20" cy="37" rx="3.5" ry="2" fill="#ff9999" opacity=".55"/>
+            <ellipse cx="44" cy="37" rx="3.5" ry="2" fill="#ff9999" opacity=".55"/>
+            <!-- smile -->
+            <path d="M24 41 Q32 48 40 41" stroke="#1a1a0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <!-- tiny leaf -->
+            <ellipse cx="36" cy="8" rx="4" ry="6" fill="#4a8a3f" transform="rotate(20,36,8)"/>
+            <ellipse cx="28" cy="9" rx="3" ry="5" fill="#3a7a2f" transform="rotate(-15,28,9)"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-family:var(--pixel-font);font-size:11px;color:#2d5a27;margin-bottom:5px;">★ <span class="rainbow-text">avocado.exe</span></div>
+          <div class="about-text">hey!! i'm <strong>avocado</strong> <span class="waving">👋</span><br>welcome to my lil<br>corner of the web!!</div>
+        </div>
+      </div>
+      <hr class="pixel-hr">
+      <div class="inset-box" style="margin-bottom:8px;">
+        <div class="about-text">
+          🥑 opposite absolute chaotic · certified napper<br>
+          📍 somewhere on the internet<br>
+          💻 learning cute coding &lpar;wants to is a better word&rpar;<br>
+          🎵 kpop girlie + drama enthusiast<br>
+          😴 sleeping & doing nothing is a personality trait<br>
+        </div>
+      </div>
+      <div class="about-text" style="font-size:17px;line-height:1.6;color:#222;">
+        i made this lil site because i wanted my own space on the internet!!
+        i love kdramas, tdramas, kpop, manhwas, and just... existing peacefully.
+        <!-- please look around and sign my guestbook 💌 -->
+        the site is still under construction, so things may not work fully yet &lpar;like guestbook&rpar;
+      </div>
+      <hr class="pixel-hr">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+        <button class="win-form-btn" onclick="scrollTo('#guestbook')">📬 Sign Guestbook</button>
+        <button class="win-form-btn" onclick="scrollTo('#interests')">💖 My Interests</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Log -->
+  <div id="diary" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📋</span><span>Update Log</span></div>
+      <div class="win-controls"><button class="win-btn">_</button></div>
+    </div>
+    <div class="win-menubar">
+      <span class="win-menu-item">View</span><span class="win-menu-item">RSS 📡</span>
+    </div>
+    <div class="win-content">
+      <div id="updateLog">
+        <div class="update-entry">
+          <div class="update-date">📅 05.29.2026 <span class="new-badge">NEW</span></div>
+          <div class="update-text">
+            site is officially LIVE!! 🎉 hello world!! this is my first ever personal webpage.
+            not much here yet but i'm building it up slowly. please be patient with me,
+            i'm still learning 🌿
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="win-statusbar">
+      <div class="statusbar-panel" id="updateCount">1 update</div>
+      <div class="statusbar-panel">RSS: Valid ✓</div>
+    </div>
+  </div>
+
+  <!-- Interests -->
+  <div id="interests" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>💖</span><span>My Interests</span></div>
+    </div>
+    <div class="win-content">
+      <div class="section-label">✨ the things that make me, me:</div>
+      <div class="interest-grid">
+        <div class="interest-card"><span class="ic-ico">🎬</span><span class="ic-label">K-DRAMA</span></div>
+        <div class="interest-card"><span class="ic-ico">📺</span><span class="ic-label">T-DRAMA</span></div>
+        <div class="interest-card"><span class="ic-ico">🎵</span><span class="ic-label">K-POP</span></div>
+        <div class="interest-card"><span class="ic-ico">🎨</span><span class="ic-label">ART<br>(maybe??)</span></div>
+        <div class="interest-card"><span class="ic-ico">📖</span><span class="ic-label">MANHWAS<br>(sometimes)</span></div>
+        <div class="interest-card"><span class="ic-ico">💻</span><span class="ic-label">CUTE<br>CODING</span></div>
+        <div class="interest-card"><span class="ic-ico">🥑</span><span class="ic-label">ME<br>MYSELF</span></div>
+        <div class="interest-card"><span class="ic-ico">😴</span><span class="ic-label">SLEEPING</span></div>
+        <div class="interest-card"><span class="ic-ico">🛋️</span><span class="ic-label">DOING<br>NOTHING</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Under Construction -->
+  <div class="under-con">
+    <span>🚧 &nbsp; MORE PAGES COMING SOON (when i feel like it) &nbsp; 🚧</span>
+  </div>
+</div>
+
+<!-- ══ RIGHT ══ -->
+<div>
+  <!-- Blinkies & Stamps -->
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>✨</span><span>Blinkies & Stamps</span></div>
+    </div>
+    <div class="win-content">
+      <div class="blinkies-area" style="margin-bottom:8px;">
+        <div class="blinky" style="background:#1a3d17;color:#c8e86a;border-color:#4a8a3f;">🥑 avocado</div>
+        <div class="blinky" style="background:#ff69b4;color:#fff;border-color:#ff1493;">💖 k-girlie</div>
+        <div class="blinky" style="background:#000050;color:#aaaaff;border-color:#0000ff;">📺 drama fan</div>
+        <div class="blinky" style="background:#4b0082;color:#dda0dd;border-color:#8a2be2;">🌙 night owl</div>
+        <div class="blinky" style="background:#330000;color:#ff9999;border-color:#cc0000;">😴 sleepy</div>
+        <div class="blinky" style="background:#003300;color:#00ff44;border-color:#00aa00;">💻 learning</div>
+        <div class="blinky" style="background:#111;color:#0ff;border-color:#0ff;">📖 manhwa</div>
+        <div class="blinky" style="background:#220022;color:#ff44ff;border-color:#aa00aa;">🎵 kpop</div>
+      </div>
+      <hr class="pixel-hr">
+      <div class="section-label" style="margin-top:6px;">🏷️ stamps:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        <div class="stamp" style="background:#1a3d17;color:#c8e86a;border-color:#4a8a3f;"><span class="si">💻</span><span>made with<br>HTML+CSS</span></div>
+        <div class="stamp" style="background:#220011;color:#ff69b4;border-color:#ff1493;"><span class="si">🥑</span><span>avocado<br>supremacy</span></div>
+        <div class="stamp" style="background:#001100;color:#00ff44;border-color:#00cc00;"><span class="si">😴</span><span>sleep is<br>self care</span></div>
+        <div class="stamp" style="background:#000050;color:#aaaaff;border-color:#0000ff;"><span class="si">🎵</span><span>kpop<br>always</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Stats -->
+  <div id="stats" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📊</span><span>My Stats.exe</span></div>
+    </div>
+    <div class="win-content">
+      <div class="section-label">⚡ current mood: <span id="moodDisplay" style="font-size:18px;margin-left:4px;">😊</span></div>
+      <div class="section-label" style="margin-top:4px;">☕ caffeine level:</div>
+      <div class="progress-container">
+        <div class="progress-fill" id="pb-caffeine" style="width:70%;background:linear-gradient(90deg,#2d5a27,#4a8a3f);"><span class="progress-label" id="pl-caffeine">70%</span></div>
+      </div>
+      <div class="section-label">📺 drama obsession:</div>
+      <div class="progress-container">
+        <div class="progress-fill" id="pb-drama" style="width:95%;background:linear-gradient(90deg,#880040,#ff69b4);"><span class="progress-label" id="pl-drama">95%</span></div>
+      </div>
+      <div class="section-label">😴 sleepiness:</div>
+      <div class="progress-container">
+        <div class="progress-fill" id="pb-sleep" style="width:80%;background:linear-gradient(90deg,#2d0050,#8800ff);"><span class="progress-label" id="pl-sleep">80%</span></div>
+      </div>
+      <div class="section-label">💖 happiness:</div>
+      <div class="progress-container" style="margin-bottom:10px;">
+        <div class="progress-fill" id="pb-happy" style="width:88%;background:linear-gradient(90deg,#006600,#88cc44);"><span class="progress-label" id="pl-happy">88%</span></div>
+      </div>
+      <div style="text-align:right;">
+        <button class="win-form-btn" onclick="openStatsModal()" style="font-size:6px;">🔒 owner edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Currently... -->
+  <div id="currently" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📖</span><span>Currently...</span></div>
+    </div>
+    <div class="win-content">
+      <div class="raised-box" style="margin-bottom:6px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">📺 WATCHING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-watching">Ask Me Anything</div>
+      </div>
+      <div class="raised-box" style="margin-bottom:6px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">📖 READING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-reading">a manhwa probably</div>
+      </div>
+      <div class="raised-box" style="margin-bottom:6px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">🎵 LISTENING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-listening">kpop on shuffle ♪</div>
+      </div>
+      <div class="raised-box">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">😴 FEELING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-feeling">sleepy as always</div>
+      </div>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="win-form-btn" onclick="openCurrentlyModal()" style="font-size:6px;">🔒 owner edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guestbook -->
+  <div id="guestbook" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📬</span><span>Guestbook</span></div>
+    </div>
+    <div class="win-content">
+      <div class="section-label">💌 visitor messages:</div>
+      <div class="gb-list" id="gbList">
+        <!-- entries rendered by JS -->
+      </div>
+      <hr class="pixel-hr">
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:4px;color:#555;">LEAVE A MESSAGE:</div>
+      <input class="win-form-input" id="gbName" type="text" placeholder="your name..." style="margin-bottom:4px;" maxlength="30"/>
+      <textarea class="win-form-input" id="gbMsg" placeholder="say hi!! 🌸" style="height:52px;resize:none;margin-bottom:6px;" maxlength="200"></textarea>
+      <button class="win-form-btn primary" onclick="submitGuestbook()">📨 Sign!</button>
+    </div>
+    <div class="win-statusbar">
+      <div class="statusbar-panel" id="gbCount">0 messages</div>
+    </div>
+  </div>
+
+  <!-- Links -->
+  <div id="links" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🔗</span><span>Cool Links</span></div>
+    </div>
+    <div class="win-content">
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:6px;color:var(--win-title);">★ EXPLORE THE SMALL WEB:</div>
+      <div class="tree-item"><span>🌐</span><a href="https://neocities.org" target="_blank">neocities.org</a></div>
+      <div class="tree-item"><span>🖥️</span><a href="https://windows93.net" target="_blank">windows93.net</a></div>
+      <div class="tree-item"><span>📡</span><span style="color:#808080;">wiiring webring</span></div>
+      <div class="tree-item"><span>💾</span><a href="https://archive.org" target="_blank">internet archive</a></div>
+      <div class="tree-item"><span>🌿</span><span style="color:#808080;">my friend's site (soon)</span></div>
+    </div>
+  </div>
+</div>
+</div><!-- /page-layout -->
+
+<!-- TASKBAR -->
+<div class="taskbar">
+  <button class="start-btn" onclick="scrollTo('#home')"><span>🥑</span><strong>Start</strong></button>
+  <div class="tbdiv"></div>
+  <button class="taskbar-btn" onclick="scrollTo('#about')">🥑 About</button>
+  <button class="taskbar-btn" onclick="scrollTo('#music')">🎵 Music</button>
+  <button class="taskbar-btn" onclick="scrollTo('#guestbook')">📬 Guestbook</button>
+  <button class="taskbar-btn" onclick="scrollTo('#stats')">📊 Stats</button>
+  <div class="tbdiv"></div>
+  <div style="display:flex;align-items:center;gap:4px;font-size:12px;">🔊💻🌐</div>
+  <div class="clock-area" id="clockDisplay">--:-- --</div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast" class="toast hidden"></div>
+
+<script>
+// ═══════════════════════════════════════
+// OWNER PASSWORD — change this!!
+const OWNER_PASS = "avocado";
+// ═══════════════════════════════════════
+
+// ─── SMOOTH SCROLL ───
+function scrollTo(id) {
+  const el = document.querySelector(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── CLOCK ───
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours();
+  const m = now.getMinutes().toString().padStart(2,'0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('clockDisplay').textContent = h + ':' + m + ' ' + ampm;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ─── LAST UPDATED DATE ───
+function formatDate(d) {
+  const date = new Date(d);
+  return (date.getMonth()+1).toString().padStart(2,'0') + '.' + date.getDate().toString().padStart(2,'0') + '.' + String(date.getFullYear()).slice(2);
+}
+document.getElementById('lastUpdatedHeader').textContent = formatDate(Date.now());
+
+// ─── VISITOR COUNT ───
+function getVisitorCount() {
+  return parseInt(localStorage.getItem('avo_visitors') || '1', 10);
+}
+function setVisitorCount(n) {
+  localStorage.setItem('avo_visitors', n.toString());
+}
+(function initVisitor() {
+  let count = getVisitorCount();
+  if (!sessionStorage.getItem('avo_counted')) {
+    count++;
+    setVisitorCount(count);
+    sessionStorage.setItem('avo_counted', '1');
+  }
+  document.getElementById('visitorCount').textContent = count.toLocaleString();
+  document.getElementById('counterDisplay').textContent = count.toString();
+  document.getElementById('dialogVisitor').textContent = count.toLocaleString();
+})();
+
+// ─── EQ BARS ───
+const eqC = document.getElementById('eqBars');
+[8,14,6,12,10,4,16,8,12].forEach(function(h,i){
+  const b = document.createElement('div');
+  b.className = 'eq-bar';
+  b.style.setProperty('--h', h+'px');
+  b.style.setProperty('--d', (0.25+Math.random()*0.45)+'s');
+  b.style.animationDelay = (i*0.05)+'s';
+  eqC.appendChild(b);
+});
+
+// ─── MUSIC PLAYER ───
+const tracks = [
+  '🎵 kpop playlist — shuffle mode',
+  '🎵 IVE — After LIKE',
+  '🎵 aespa — Supernova',
+  '🎵 NewJeans — Hype Boy',
+  '🎵 BLACKPINK — How You Like That',
+  '🎵 LE SSERAFIM — FEARLESS',
+  '🎵 EXO — Love Shot',
+  '🎵 BTS — Dynamite',
+];
+let trackIdx = 0;
+const playlist = document.getElementById('playlist');
+tracks.slice(1).forEach(function(t,i){
+  const d = document.createElement('div');
+  d.style.cssText = 'font-family:var(--vt-font);font-size:14px;color:#00aa33;padding:1px 3px;cursor:pointer;';
+  d.textContent = (i+1)+'. '+t.replace('🎵 ','');
+  d.onclick = function(){ trackIdx=i+1; updateTrack(); };
+  d.onmouseover = function(){ d.style.background='#003300'; };
+  d.onmouseout = function(){ d.style.background=''; };
+  playlist.appendChild(d);
+});
+function updateTrack() {
+  document.getElementById('trackName').textContent = tracks[trackIdx] + ' \u00a0\u00a0\u00a0';
+}
+function nextTrack(){ trackIdx=(trackIdx+1)%tracks.length; updateTrack(); }
+function prevTrack(){ trackIdx=(trackIdx-1+tracks.length)%tracks.length; updateTrack(); }
+function stopTrack(){ trackIdx=0; updateTrack(); }
+function togglePlay(){ /* cosmetic */ }
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.classList.add('hidden'); }, 2500);
+}
+
+// ─── GUESTBOOK ───
+function loadGuestbook() {
+  const entries = JSON.parse(localStorage.getItem('avo_gb') || '[]');
+  const list = document.getElementById('gbList');
+  list.innerHTML = '';
+  if (entries.length === 0) {
+    list.innerHTML = '<div style="font-family:var(--vt-font);font-size:16px;color:#888;padding:8px;">no messages yet... be the first!! 🌸</div>';
+  } else {
+    entries.slice().reverse().forEach(function(e) {
+      const div = document.createElement('div');
+      div.className = 'gb-entry';
+      div.innerHTML = '<div class="gb-name"><span>💬 '+escHtml(e.name)+'</span><span class="gb-date">'+e.date+'</span></div>' +
+        '<div class="gb-msg">'+escHtml(e.msg)+'</div>';
+      list.appendChild(div);
+    });
+  }
+  document.getElementById('gbCount').textContent = entries.length + ' message' + (entries.length !== 1 ? 's' : '');
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function submitGuestbook() {
+  const name = document.getElementById('gbName').value.trim();
+  const msg = document.getElementById('gbMsg').value.trim();
+  if (!name) { showToast('please enter your name!! 🌸'); return; }
+  if (!msg) { showToast('please write a message!! 💌'); return; }
+  const entries = JSON.parse(localStorage.getItem('avo_gb') || '[]');
+  const now = new Date();
+  entries.push({
+    name: name,
+    msg: msg,
+    date: (now.getMonth()+1).toString().padStart(2,'0') + '.' + now.getDate().toString().padStart(2,'0') + '.' + String(now.getFullYear()).slice(2)
+  });
+  if (entries.length > 100) entries.shift();
+  localStorage.setItem('avo_gb', JSON.stringify(entries));
+  document.getElementById('gbName').value = '';
+  document.getElementById('gbMsg').value = '';
+  loadGuestbook();
+  showToast('message saved!! thank you 💌');
+}
+loadGuestbook();
+
+// ─── STATS ───
+const defaultStats = { mood:'😊', caffeine:70, drama:95, sleep:80, happy:88 };
+function loadStats() {
+  const s = JSON.parse(localStorage.getItem('avo_stats') || JSON.stringify(defaultStats));
+  document.getElementById('moodDisplay').textContent = s.mood || '😊';
+  setBar('caffeine', s.caffeine !== undefined ? s.caffeine : defaultStats.caffeine);
+  setBar('drama', s.drama !== undefined ? s.drama : defaultStats.drama);
+  setBar('sleep', s.sleep !== undefined ? s.sleep : defaultStats.sleep);
+  setBar('happy', s.happy !== undefined ? s.happy : defaultStats.happy);
+}
+function setBar(id, val) {
+  const bar = document.getElementById('pb-'+id);
+  const lbl = document.getElementById('pl-'+id);
+  if (bar) bar.style.width = val + '%';
+  if (lbl) lbl.textContent = val + '%';
+}
+loadStats();
+
+function openStatsModal() {
+  const pw = prompt('🔒 owner password:');
+  if (!pw || pw !== OWNER_PASS) { if(pw !== null) showToast('wrong password!! 🔒'); return; }
+  const s = JSON.parse(localStorage.getItem('avo_stats') || JSON.stringify(defaultStats));
+  const moods = ['😊','😄','😎','🥰','😴','😤','🥺','😂','🤔','✨','🥑','💖'];
+  const selected = s.mood || '😊';
+  let html = '<div style="margin-bottom:8px;">' +
+    '<div style="font-family:var(--pixel-font);font-size:7px;color:var(--win-title);margin-bottom:6px;">MOOD:</div>' +
+    '<div class="mood-selector" id="moodSel">' +
+    moods.map(function(m){ return '<div class="mood-opt'+(m===selected?' selected':'')+'" onclick="selectMood(this,\''+m+'\')">'+m+'</div>'; }).join('') +
+    '</div></div>';
+  [['caffeine','☕ Caffeine %'],['drama','📺 Drama Obsession %'],['sleep','😴 Sleepiness %'],['happy','💖 Happiness %']].forEach(function(r){
+    const val = s[r[0]] !== undefined ? s[r[0]] : defaultStats[r[0]];
+    html += '<div class="stat-row"><label>'+r[1]+'</label>' +
+      '<input type="range" min="0" max="100" value="'+val+'" oninput="document.getElementById(\'rv-'+r[0]+'\').textContent=this.value+\'%\'" id="sr-'+r[0]+'" />' +
+      '<span class="val" id="rv-'+r[0]+'">'+val+'%</span></div>';
+  });
+  html += '<div style="margin-top:10px;display:flex;gap:6px;justify-content:flex-end;">' +
+    '<button class="win-form-btn" onclick="closeStatsModal()">Cancel</button>' +
+    '<button class="win-form-btn primary" onclick="saveStats()">💾 Save</button></div>';
+  document.getElementById('statsModalContent').innerHTML = html;
+  document.getElementById('statsModal').classList.remove('hidden');
+}
+function selectMood(el, m) {
+  document.querySelectorAll('.mood-opt').forEach(function(o){ o.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function saveStats() {
+  const moodEl = document.querySelector('.mood-opt.selected');
+  const s = {
+    mood: moodEl ? moodEl.textContent : '😊',
+    caffeine: parseInt(document.getElementById('sr-caffeine').value),
+    drama: parseInt(document.getElementById('sr-drama').value),
+    sleep: parseInt(document.getElementById('sr-sleep').value),
+    happy: parseInt(document.getElementById('sr-happy').value)
+  };
+  localStorage.setItem('avo_stats', JSON.stringify(s));
+  loadStats();
+  closeStatsModal();
+  showToast('stats updated!! 📊');
+}
+function closeStatsModal() {
+  document.getElementById('statsModal').classList.add('hidden');
+}
+
+// ─── CURRENTLY MODAL ───
+function loadCurrently() {
+  const c = JSON.parse(localStorage.getItem('avo_currently') || '{}');
+  if (c.watching) document.getElementById('curr-watching').textContent = c.watching;
+  if (c.reading) document.getElementById('curr-reading').textContent = c.reading;
+  if (c.listening) document.getElementById('curr-listening').textContent = c.listening;
+  if (c.feeling) document.getElementById('curr-feeling').textContent = c.feeling;
+}
+loadCurrently();
+function openCurrentlyModal() {
+  const pw = prompt('🔒 owner password:');
+  if (!pw || pw !== OWNER_PASS) { if(pw !== null) showToast('wrong password!! 🔒'); return; }
+  const c = JSON.parse(localStorage.getItem('avo_currently') || '{}');
+  const fields = [['watching','📺 Watching'],['reading','📖 Reading'],['listening','🎵 Listening'],['feeling','😴 Feeling']];
+  let html = '<div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:8px;color:var(--win-title);">UPDATE CURRENTLY:</div>';
+  fields.forEach(function(f){
+    const val = c[f[0]] || '';
+    html += '<div style="margin-bottom:6px;"><div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:3px;color:#555;">'+f[1]+':</div>' +
+      '<input class="win-form-input" id="curr-edit-'+f[0]+'" type="text" value="'+escHtml(val)+'" placeholder="..." /></div>';
+  });
+  html += '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:10px;">' +
+    '<button class="win-form-btn" onclick="closeStatsModal()">Cancel</button>' +
+    '<button class="win-form-btn primary" onclick="saveCurrently()">💾 Save</button></div>';
+  document.getElementById('statsModalContent').innerHTML = html;
+  document.getElementById('statsModal').classList.remove('hidden');
+}
+function saveCurrently() {
+  const c = {
+    watching: document.getElementById('curr-edit-watching').value.trim(),
+    reading: document.getElementById('curr-edit-reading').value.trim(),
+    listening: document.getElementById('curr-edit-listening').value.trim(),
+    feeling: document.getElementById('curr-edit-feeling').value.trim()
+  };
+  localStorage.setItem('avo_currently', JSON.stringify(c));
+  loadCurrently();
+  closeStatsModal();
+  showToast('updated!! ✨');
+}
+
+// ─── INTERESTS CLICK ───
+const interestLabels = {
+  'K-DRAMA':'you have excellent taste in kdramas 🎬',
+  'T-DRAMA':'taiwanese dramas are SO underrated 📺',
+  'K-POP':'kpop has taken over my entire brain 🎵',
+  'ART\n(maybe??)':'i do art... sometimes... maybe... we\'ll see 🎨',
+  'MANHWAS\n(sometimes)':'reading manhwas at 3am is a personality type 📖',
+  'CUTE\nCODING':'html is literally just decorating a webpage!! 💻',
+  'ME\nMYSELF':'self appreciation is very important 🥑',
+  'SLEEPING':'sleeping is a skill and i am a master 😴',
+  'DOING\nNOTHING':'the art of doing absolutely nothing 🛋️'
+};
+document.querySelectorAll('.interest-card').forEach(function(card){
+  card.addEventListener('click', function(){
+    const label = card.querySelector('.ic-label').textContent.trim();
+    const msg = interestLabels[label] || 'shrine coming soon!! 🌸';
+    showToast(msg);
+  });
+});
+</script>
+</body>
+</html>
