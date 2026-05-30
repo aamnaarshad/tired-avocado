@@ -337,7 +337,7 @@ function scrollTo(id) {
 // ── EQ bars ──────────────────────────────────────────────────────
 const eqC = document.getElementById('eqBars');
 if (eqC) {
-const heights =;
+const heights =[8, 14, 6, 12, 10, 4, 16, 8, 12];
 heights.forEach(function(h, i) {
     const b = document.createElement('div');
 b.className = 'eq-bar';
