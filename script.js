@@ -472,6 +472,13 @@ function prevTrack() { trackIdx = (trackIdx - 1 + tracks.length) % tracks.length
 function stopTrack() { trackIdx = 0; updateTrack(); }
 function togglePlay() { /* cosmetic placeholder */ }
 
+// ── Music player buttons ─────────────────────────────────────────
+document.getElementById('btnPrev').addEventListener('click', prevTrack);
+document.getElementById('btnStop').addEventListener('click', stopTrack);
+document.getElementById('playBtn').addEventListener('click', togglePlay);
+document.getElementById('btnPause').addEventListener('click', togglePlay);
+document.getElementById('btnNext').addEventListener('click', nextTrack);
+
 // ── Interest Cards Hook ─────────────────────────────────────────
 const interestLabels = {
   'K-DRAMA': 'you have excellent taste in kdramas 🎬',
@@ -490,6 +497,30 @@ document.querySelectorAll('.interest-card').forEach(function(card) {
     const label = card.querySelector('.ic-label').textContent.trim();
     const msg = interestLabels[label] || 'shrine coming soon!! 🌸';
     showToast(msg);
+  });
+});
+
+// ── Welcome dialog ───────────────────────────────────────────────
+function closeWelcome() {
+  document.getElementById('welcomeDialog').classList.add('hidden');
+}
+document.getElementById('welcomeCloseX').addEventListener('click', closeWelcome);
+document.getElementById('welcomeCloseOk').addEventListener('click', closeWelcome);
+
+// ── Stats modal close X ──────────────────────────────────────────
+document.getElementById('statsModalCloseX').addEventListener('click', closeStatsModal);
+
+// ── Owner edit buttons ───────────────────────────────────────────
+document.getElementById('btnOpenStats').addEventListener('click', openStatsModal);
+document.getElementById('btnOpenCurrently').addEventListener('click', openCurrentlyModal);
+
+// ── Guestbook submit ─────────────────────────────────────────────
+document.getElementById('btnSubmitGuestbook').addEventListener('click', submitGuestbook);
+
+// ── data-scroll: universal scroll delegation ─────────────────────
+document.querySelectorAll('[data-scroll]').forEach(function(el) {
+  el.addEventListener('click', function() {
+    scrollTo(el.getAttribute('data-scroll'));
   });
 });
 
