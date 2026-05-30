@@ -337,13 +337,14 @@ function scrollTo(id) {
 // ── EQ bars ──────────────────────────────────────────────────────
 const eqC = document.getElementById('eqBars');
 if (eqC) {
- .forEach(function(h, i) {
+const heights =;
+heights.forEach(function(h, i) {
     const b = document.createElement('div');
-    b.className = 'eq-bar';
-    b.style.setProperty('--h', h + 'px');
-    b.style.setProperty('--d', (0.25 + Math.random() * 0.45) + 's');
-    b.style.animationDelay = (i * 0.05) + 's';
-    eqC.appendChild(b);
+b.className = 'eq-bar';
+b.style.setProperty('--h', h + 'px');
+b.style.setProperty('--d', (0.25 + Math.random() * 0.45) + 's');
+b.style.animationDelay = (i * 0.05) + 's';
+eqC.appendChild(b);
   });
 }
 
