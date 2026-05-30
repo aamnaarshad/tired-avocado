@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://uerryqabhgteigdzwfhi.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlcnJ5cWFiaGd0ZWlnZHp3ZmhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTgzNDEsImV4cCI6MjA5NTY3NDM0MX0.qs1vbHAvk8vdc5kNice5t9TQV_YsoBQ0TqqkIOc6Y0c';
-const OWNER_PASS    = 'avocadomin';   
+const OWNER_PASS    = 'avocadomin';
 
 // ── Tiny Supabase REST helper ────────────────────────────────────
 const db = {
@@ -44,13 +44,13 @@ async function initVisitor() {
   try {
     const counted = sessionStorage.getItem('avo_counted');
     let count;
-    
+
     if (!counted) {
       count = await db.rpc('increment_visitor');
       sessionStorage.setItem('avo_counted', '1');
     } else {
       const rows = await db.select('site_stats', '?select=visitor_count&limit=1');
-      count = rows ? rows.visitor_count : '??';
+      count = (rows && rows[0]) ? rows[0].visitor_count : '??'; // FIX: rows[0]
     }
 
     const countStr = Number(count).toLocaleString();
@@ -76,7 +76,7 @@ async function loadGuestbook() {
       entries.forEach(function(e) {
         const div = document.createElement('div');
         div.className = 'gb-entry';
-        div.innerHTML = 
+        div.innerHTML =
           '<div class="gb-name"><span>💬 ' + escHtml(e.name) + '</span>' +
           '<span class="gb-date">' + formatDate(e.created_at) + '</span></div>' +
           '<div class="gb-msg">' + escHtml(e.message) + '</div>';
@@ -122,7 +122,7 @@ const defaultStats = { mood: '😊', caffeine: 70, drama: 95, sleep: 80, happy: 
 async function loadStats() {
   try {
     const rows = await db.select('owner_stats', '?select=mood,caffeine,drama,sleep,happy&order=created_at.desc&limit=1');
-    const current = rows || defaultStats;
+    const current = (rows && rows[0]) || defaultStats; // FIX: rows[0]
 
     document.getElementById('moodDisplay').textContent = current.mood || defaultStats.mood;
     setBar('caffeine', current.caffeine !== undefined ? current.caffeine : defaultStats.caffeine);
@@ -154,7 +154,7 @@ function setBar(id, val) {
 async function loadCurrently() {
   try {
     const rows = await db.select('owner_currently', '?select=watching,reading,listening,feeling&order=created_at.desc&limit=1');
-    const current = rows || {};
+    const current = (rows && rows[0]) || {}; // FIX: rows[0]
 
     if (current.watching)  document.getElementById('curr-watching').textContent  = current.watching;
     if (current.reading)   document.getElementById('curr-reading').textContent   = current.reading;
@@ -172,7 +172,7 @@ async function openStatsModal() {
 
   try {
     const rows = await db.select('owner_stats', '?select=mood,caffeine,drama,sleep,happy&order=created_at.desc&limit=1');
-    const s = rows || defaultStats;
+    const s = (rows && rows[0]) || defaultStats; // FIX: rows[0]
 
     const moods = ['😊','😄','😎','🥰','😴','😤','🥺','😂','🤔','✨','🥑','💖'];
     const selected = s.mood || '😊';
@@ -180,7 +180,7 @@ async function openStatsModal() {
     let html = '<div style="margin-bottom:8px;">' +
                '<div style="font-family:var(--pixel-font);font-size:7px;color:var(--win-title);margin-bottom:6px;">MOOD:</div>' +
                '<div class="mood-selector" id="moodSel">';
-    
+
     moods.forEach(function(m) {
       html += '<div class="mood-opt' + (m === selected ? ' selected' : '') + '" onclick="selectMood(this,\'' + m + '\')">' + m + '</div>';
     });
@@ -194,10 +194,11 @@ async function openStatsModal() {
     ];
 
     rowsConfig.forEach(function(r) {
-      const val = s[r] !== undefined ? s[r] : defaultStats[r];
-      html += '<div class="stat-row"><label>' + r + '</label>' +
-              '<input type="range" min="0" max="100" value="' + val + '" oninput="document.getElementById(\'rv-' + r + '\').textContent=this.value+\'%\'" id="sr-' + r + '" />' +
-              '<span class="val" id="rv-' + r + '">' + val + '%</span></div>';
+      const key = r[0]; // FIX: use r[0] as the key, not r (which is the whole array)
+      const val = s[key] !== undefined ? s[key] : defaultStats[key];
+      html += '<div class="stat-row"><label>' + r[1] + '</label>' +
+              '<input type="range" min="0" max="100" value="' + val + '" oninput="document.getElementById(\'rv-' + key + '\').textContent=this.value+\'%\'" id="sr-' + key + '" />' +
+              '<span class="val" id="rv-' + key + '">' + val + '%</span></div>';
     });
 
     html += '<div style="margin-top:10px;display:flex;gap:6px;justify-content:flex-end;">' +
@@ -221,7 +222,7 @@ function selectMood(el, m) {
 async function saveStats() {
   const moodEl = document.querySelector('.mood-opt.selected');
   const s = {
-    mood: moodEl ? moodEl.textContent : '😊',
+    mood:     moodEl ? moodEl.textContent : '😊',
     caffeine: parseInt(document.getElementById('sr-caffeine').value),
     drama:    parseInt(document.getElementById('sr-drama').value),
     sleep:    parseInt(document.getElementById('sr-sleep').value),
@@ -245,7 +246,7 @@ async function openCurrentlyModal() {
 
   try {
     const rows = await db.select('owner_currently', '?select=watching,reading,listening,feeling&order=created_at.desc&limit=1');
-    const c = rows || {};
+    const c = (rows && rows[0]) || {}; // FIX: rows[0]
 
     const fields = [
       ['watching',  '📺 Watching'],
@@ -255,11 +256,12 @@ async function openCurrentlyModal() {
     ];
 
     let html = '<div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:8px;color:var(--win-title);">UPDATE CURRENTLY:</div>';
-    
+
     fields.forEach(function(f) {
-      const val = c[f] || '';
-      html += '<div style="margin-bottom:6px;"><div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:3px;color:#555;">' + f + ':</div>' +
-              '<input class="win-form-input" id="curr-edit-' + f + '" type="text" value="' + escHtml(val) + '" placeholder="..." /></div>';
+      const key = f[0]; // FIX: use f[0] as the key, not f (which is the whole array)
+      const val = c[key] || '';
+      html += '<div style="margin-bottom:6px;"><div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:3px;color:#555;">' + f[1] + ':</div>' +
+              '<input class="win-form-input" id="curr-edit-' + key + '" type="text" value="' + escHtml(val) + '" placeholder="..." /></div>';
     });
 
     html += '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:10px;">' +
@@ -311,8 +313,8 @@ function showToast(msg) {
 
 function formatDate(d) {
   const date = new Date(d);
-  return (date.getMonth() + 1).toString().padStart(2, '0') + '.' + 
-         date.getDate().toString().padStart(2, '0') + '.' + 
+  return (date.getMonth() + 1).toString().padStart(2, '0') + '.' +
+         date.getDate().toString().padStart(2, '0') + '.' +
          String(date.getFullYear()).slice(2);
 }
 
@@ -337,14 +339,14 @@ function scrollTo(id) {
 // ── EQ bars ──────────────────────────────────────────────────────
 const eqC = document.getElementById('eqBars');
 if (eqC) {
-const heights =[8, 14, 6, 12, 10, 4, 16, 8, 12];
-heights.forEach(function(h, i) {
+  const heights = [8, 14, 6, 12, 10, 4, 16, 8, 12];
+  heights.forEach(function(h, i) {
     const b = document.createElement('div');
-b.className = 'eq-bar';
-b.style.setProperty('--h', h + 'px');
-b.style.setProperty('--d', (0.25 + Math.random() * 0.45) + 's');
-b.style.animationDelay = (i * 0.05) + 's';
-eqC.appendChild(b);
+    b.className = 'eq-bar';
+    b.style.setProperty('--h', h + 'px');
+    b.style.setProperty('--d', (0.25 + Math.random() * 0.45) + 's');
+    b.style.animationDelay = (i * 0.05) + 's';
+    eqC.appendChild(b);
   });
 }
 
