@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' data: blob: https://uerryqabhgteigdzwfhi.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+<title>avocado's corner</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="deco-star" style="left:15%;top:22%;animation-delay:0s;">🌿</div>
+<div class="deco-star" style="left:83%;top:38%;animation-delay:1s;">✨</div>
+<div class="deco-star" style="left:71%;top:14%;animation-delay:2s;">🥑</div>
+<div class="deco-star" style="left:32%;top:58%;animation-delay:.5s;">🌸</div>
+
+<div class="desktop-icons">
+  <div class="desk-icon" onclick="scrollTo('#home')"><div class="ico">🖥️</div><span>My Computer</span></div>
+  <div class="desk-icon" onclick="scrollTo('#about')"><div class="ico">📁</div><span>About Me</span></div>
+  <div class="desk-icon" onclick="scrollTo('#guestbook')"><div class="ico">📬</div><span>Guestbook</span></div>
+  <div class="desk-icon" onclick="scrollTo('#interests')"><div class="ico">💖</div><span>Interests</span></div>
+  <div class="desk-icon" onclick="scrollTo('#stats')"><div class="ico">📊</div><span>My Stats</span></div>
+  <div class="desk-icon" onclick="scrollTo('#links')"><div class="ico">🔗</div><span>Cool Links</span></div>
+  <div class="desk-icon" onclick="scrollTo('#music')"><div class="ico">🎵</div><span>Music</span></div>
+</div>
+
+<div class="dialog-box" id="welcomeDialog">
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🥑</span><span>welcome!!</span></div>
+      <div class="win-controls"><button class="win-btn" onclick="document.getElementById('welcomeDialog').classList.add('hidden')">✕</button></div>
+    </div>
+    <div class="dialog-content">
+      <div class="dialog-ico">🥑</div>
+      <div class="dialog-text">hi!! welcome to my<br>little corner 🌿<br><br>you are visitor<br>#<span id="dialogVisitor">-</span>!!</div>
+      <div class="dialog-btns">
+        <button class="dialog-btn" onclick="document.getElementById('welcomeDialog').classList.add('hidden')">OK!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="statsModal">
+  <div class="win-window" style="width:340px;">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🔒</span><span>Edit My Stats</span></div>
+      <div class="win-controls"><button class="win-btn" onclick="closeStatsModal()">✕</button></div>
+    </div>
+    <div class="win-content" id="statsModalContent">
+      </div>
+  </div>
+</div>
+
+<div id="home" class="header-window win-window">
+  <div class="win-titlebar">
+    <div class="win-titlebar-left"><span>🥑</span><span>avocado's corner — Internet Explorer</span></div>
+    <div class="win-controls">
+      <button class="win-btn">_</button><button class="win-btn">□</button><button class="win-btn">✕</button>
+    </div>
+  </div>
+  <div class="win-menubar">
+    <span class="win-menu-item">File</span><span class="win-menu-item">Edit</span>
+    <span class="win-menu-item">View</span><span class="win-menu-item">Favorites</span>
+    <span class="win-menu-item">Help</span>
+  </div>
+  <div class="win-content" style="padding:0;">
+    <div class="header-content">
+      <div class="header-stars">🥑🌿✨🌸✨🌿🥑</div>
+      <div class="site-title">☆ <span>avocado's</span> corner ☆</div>
+      <div class="site-sub">▶ welcome to my little world ◀</div>
+      <div style="margin-top:6px;font-family:var(--vt-font);font-size:16px;color:#c8e86a;">
+        last updated: <span style="color:var(--accent-yellow);" id="lastUpdatedHeader">—</span>
+        &nbsp;|&nbsp; best viewed with: <span style="color:var(--accent-pink);">love ♡</span>
+      </div>
+      <div class="visitor-badge">VISITORS: <span id="visitorCount">...</span></div>
+    </div>
+  </div>
+  <div class="marquee-bar">
+    <div class="marquee-inner">
+      🥑 welcome to avocado's corner!! 🥑 &nbsp;&nbsp;&nbsp; 🎵 kpop&nbsp;girlie&nbsp;forever 🎵 &nbsp;&nbsp;&nbsp; 📺 currently&nbsp;catching&nbsp;up&nbsp;on&nbsp;kdramas &nbsp;&nbsp;&nbsp; 💤 professional&nbsp;napper &nbsp;&nbsp;&nbsp; ✨ thanks&nbsp;for&nbsp;visiting&nbsp;my&nbsp;little&nbsp;world ✨ &nbsp;&nbsp;&nbsp; 📖 reading&nbsp;manhwas&nbsp;at&nbsp;3am &nbsp;&nbsp;&nbsp; 🌿 me,&nbsp;myself,&nbsp;and&nbsp;my&nbsp;avocados 🌿 &nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+</div>
+
+<div class="page-layout">
+
+<div>
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📁</span><span>Navigation</span></div>
+      <div class="win-controls"><button class="win-btn">_</button></div>
+    </div>
+    <div class="win-content" style="padding:4px;">
+      <ul class="nav-tree">
+        <li class="active" onclick="scrollTo('#home')">🏠 home</li>
+        <li onclick="scrollTo('#about')">🥑 about me</li>
+        <li onclick="scrollTo('#diary')">📓 update log</li>
+        <li onclick="scrollTo('#interests')">💖 interests</li>
+        <li onclick="scrollTo('#music')">🎵 music player</li>
+        <li onclick="scrollTo('#stats')">📊 my stats</li>
+        <li onclick="scrollTo('#guestbook')">📬 guestbook</li>
+        <li onclick="scrollTo('#currently')">📺 currently...</li>
+        <li onclick="scrollTo('#links')">🔗 cool links</li>
+      </ul>
+    </div>
+    <div class="win-statusbar"><div class="statusbar-panel">9 sections</div></div>
+  </div>
+
+  <div id="music" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🎵</span><span>WinAmp 2.91</span></div>
+      <div class="win-controls"><button class="win-btn">_</button></div>
+    </div>
+    <div class="win-content" style="padding:4px;background:#111;">
+      <div class="player-display">
+        <div class="track-scroll"><span id="trackName">🎵 kpop playlist — shuffle mode &nbsp;&nbsp;&nbsp;</span></div>
+        <div class="eq-bars" id="eqBars"></div>
+      </div>
+      <div class="player-controls">
+        <button class="p-btn" onclick="prevTrack()">⏮</button>
+        <button class="p-btn" onclick="stopTrack()">⏹</button>
+        <button class="p-btn" id="playBtn" onclick="togglePlay()" style="background:#004400;color:#00ff00;">▶</button>
+        <button class="p-btn" onclick="togglePlay()">⏸</button>
+        <button class="p-btn" onclick="nextTrack()">⏭</button>
+      </div>
+      <div style="margin-top:6px;padding:4px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#888;margin-bottom:2px;">VOL</div>
+        <input type="range" min="0" max="100" value="75" style="width:100%;accent-color:#00ff44;height:8px;"/>
+      </div>
+      <div style="padding:0 4px 4px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin:4px 0 2px;">PLAYLIST:</div>
+        <div id="playlist" style="background:#001100;border:1px inset #004400;padding:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>👁️</span><span>Visitor Counter</span></div>
+    </div>
+    <div class="win-content" style="text-align:center;">
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:6px;color:#555;">YOU ARE VISITOR:</div>
+      <div class="counter" id="counterDisplay">...</div>
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-top:6px;color:#555;">since 05.29.2026</div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div id="about" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🥑</span><span>About Me — README.txt</span></div>
+      <div class="win-controls">
+        <button class="win-btn">_</button><button class="win-btn">□</button><button class="win-btn">✕</button>
+      </div>
+    </div>
+    <div class="win-content">
+      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;">
+        <div class="avatar-frame">
+          <svg viewBox="0 0 64 72" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 32,8 C 41,8 44,22 47,32 C 51,43 54,58 44,66 C 36,72 28,72 20,66 C 10,58 13,43 17,32 C 20,22 23,8 32,8 Z" fill="#2d5a27"/>
+            <path d="M 32,12 C 39,12 41,24 43,33 C 46,42 49,55 41,62 C 35,67 29,67 23,62 C 15,55 18,42 21,33 C 23,24 25,12 32,12 Z" fill="#c8e86a"/>
+            <circle cx="32" cy="49" r="8" fill="#8B4513"/>
+            <circle cx="32" cy="49" r="6.5" fill="#a05c2a"/>
+            <circle cx="30.5" cy="47.5" r="1.5" fill="#c47a3a" opacity=".6"/>
+            <circle cx="24" cy="30" r="2.5" fill="#1a1a0a"/>
+            <circle cx="40" cy="30" r="2.5" fill="#1a1a0a"/>
+            <circle cx="24.8" cy="29.2" r="0.8" fill="white"/>
+            <circle cx="40.8" cy="29.2" r="0.8" fill="white"/>
+            <ellipse cx="20" cy="33" rx="3.5" ry="2" fill="#ff9999" opacity=".6"/>
+            <ellipse cx="44" cy="33" rx="3.5" ry="2" fill="#ff9999" opacity=".6"/>
+            <path d="M 28,34 Q 32,38 36,34" stroke="#1a1a0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <ellipse cx="36" cy="9" rx="3.5" ry="5.5" fill="#4a8a3f" transform="rotate(25,36,9)"/>
+            <ellipse cx="28" cy="10" rx="2.5" ry="4.5" fill="#3a7a2f" transform="rotate(-20,28,10)"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-family:var(--pixel-font);font-size:11px;color:#2d5a27;margin-bottom:5px;">★ <span class="rainbow-text">avocado.exe</span></div>
+          <div class="about-text">hey!! i'm <strong>avocado</strong> <span class="waving">👋</span><br>welcome to my lil<br>corner of the web!!</div>
+        </div>
+      </div>
+      <hr class="pixel-hr">
+      <div class="inset-box" style="margin-bottom:8px;">
+        <div class="about-text">
+          🥑 opposite absolute chaotic · certified napper<br>
+          📍 somewhere on the internet<br>
+          💻 learning cute coding &lpar;wants to is a better word&rpar;<br>
+          🎵 kpop girlie + drama enthusiast<br>
+          😴 sleeping &amp; doing nothing is a personality trait<br>
+        </div>
+      </div>
+      <div class="about-text" style="font-size:17px;line-height:1.6;color:#222;">
+        i made this lil site because i wanted my own space on the internet!!
+        i love kdramas, tdramas, kpop, manhwas, and just... existing peacefully.
+        the site is still under construction, so things may not work fully yet &lpar;like guestbook&rpar;
+      </div>
+      <hr class="pixel-hr">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+        <button class="win-form-btn" onclick="scrollTo('#guestbook')">📬 Sign Guestbook</button>
+        <button class="win-form-btn" onclick="scrollTo('#interests')">💖 My Interests</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="diary" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📋</span><span>Update Log</span></div>
+      <div class="win-controls"><button class="win-btn">_</button></div>
+    </div>
+    <div class="win-menubar">
+      <span class="win-menu-item">View</span><span class="win-menu-item">RSS 📡</span>
+    </div>
+    <div class="win-content">
+      <div id="updateLog">
+        <div class="update-entry">
+          <div class="update-date">📅 05.29.2026 <span class="new-badge">NEW</span></div>
+          <div class="update-text">
+            site is officially LIVE!! 🎉 hello world!! this is my first ever personal webpage.
+            not much here yet but i'm building it up slowly. please be patient with me,
+            i'm still learning 🌿
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="win-statusbar">
+      <div class="statusbar-panel" id="updateCount">1 update</div>
+      <div class="statusbar-panel">RSS: Valid ✓</div>
+    </div>
+  </div>
+
+  <div id="interests" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>💖</span><span>My Interests</span></div>
+    </div>
+    <div class="win-content">
+      <div class="section-label">✨ the things that make me, me:</div>
+      <div class="interest-grid">
+        <div class="interest-card"><span class="ic-ico">🎬</span><span class="ic-label">K-DRAMA</span></div>
+        <div class="interest-card"><span class="ic-ico">📺</span><span class="ic-label">T-DRAMA</span></div>
+        <div class="interest-card"><span class="ic-ico">🎵</span><span class="ic-label">K-POP</span></div>
+        <div class="interest-card"><span class="ic-ico">🎨</span><span class="ic-label">ART<br>(maybe??)</span></div>
+        <div class="interest-card"><span class="ic-ico">📖</span><span class="ic-label">MANHWAS<br>(sometimes)</span></div>
+        <div class="interest-card"><span class="ic-ico">💻</span><span class="ic-label">CUTE<br>CODING</span></div>
+        <div class="interest-card"><span class="ic-ico">🥑</span><span class="ic-label">ME<br>MYSELF</span></div>
+        <div class="interest-card"><span class="ic-ico">😴</span><span class="ic-label">SLEEPING</span></div>
+        <div class="interest-card"><span class="ic-ico">🛋️</span><span class="ic-label">DOING<br>NOTHING</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="under-con">
+    <span>🚧 &nbsp; MORE PAGES COMING SOON (when i feel like it) &nbsp; 🚧</span>
+  </div>
+</div>
+
+<div>
+  <div class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>✨</span><span>Blinkies &amp; Stamps</span></div>
+    </div>
+    <div class="win-content">
+      <div class="blinkies-area" style="margin-bottom:8px;">
+        <div class="blinky" style="background:#1a3d17;color:#c8e86a;border-color:#4a8a3f;">🥑 avocado</div>
+        <div class="blinky" style="background:#ff69b4;color:#fff;border-color:#ff1493;">💖 k-girlie</div>
+        <div class="blinky" style="background:#000050;color:#aaaaff;border-color:#0000ff;">📺 drama fan</div>
+        <div class="blinky" style="background:#4b0082;color:#dda0dd;border-color:#8a2be2;">🌙 night owl</div>
+        <div class="blinky" style="background:#330000;color:#ff9999;border-color:#cc0000;">😴 sleepy</div>
+        <div class="blinky" style="background:#003300;color:#00ff44;border-color:#00aa00;">💻 learning</div>
+        <div class="blinky" style="background:#111;color:#0ff;border-color:#0ff;">📖 manhwa</div>
+        <div class="blinky" style="background:#220022;color:#ff44ff;border-color:#aa00aa;">🎵 kpop</div>
+      </div>
+      <hr class="pixel-hr">
+      <div class="section-label" style="margin-top:6px;">🏷️ stamps:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        <div class="stamp" style="background:#1a3d17;color:#c8e86a;border-color:#4a8a3f;"><span class="si">💻</span><span>made with<br>HTML+CSS</span></div>
+        <div class="stamp" style="background:#220011;color:#ff69b4;border-color:#ff1493;"><span class="si">🥑</span><span>avocado<br>supremacy</span></div>
+        <div class="stamp" style="background:#001100;color:#00ff44;border-color:#00cc00;"><span class="si">😴</span><span>sleep is<br>self care</span></div>
+        <div class="stamp" style="background:#000050;color:#aaaaff;border-color:#0000ff;"><span class="si">🎵</span><span>kpop<br>always</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="stats" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📊</span><span>My Stats.exe</span></div>
+    </div>
+    <div class="win-content">
+      <div class="section-label">⚡ current mood: <span id="moodDisplay" style="font-size:18px;margin-left:4px;">😊</span></div>
+      <div class="section-label" style="margin-top:4px;">☕ caffeine level:</div>
+      <div class="progress-container">
+        <div class="progress-fill" id="pb-caffeine" style="width:70%;background:linear-gradient(90deg,#2d5a27,#4a8a3f);"><span class="progress-label" id="pl-caffeine">70%</span></div>
+      </div>
+      <div class="section-label">📺 drama obsession:</div>
+      <div class="progress-container">
+        <div class="progress-fill" id="pb-drama" style="width:95%;background:linear-gradient(90deg,#880040,#ff69b4);"><span class="progress-label" id="pl-drama">95%</span></div>
+      </div>
+      <div class="section-label">😴 sleepiness:</div>
+      <div class="progress-container">
+        <div class="progress-fill" id="pb-sleep" style="width:80%;background:linear-gradient(90deg,#2d0050,#8800ff);"><span class="progress-label" id="pl-sleep">80%</span></div>
+      </div>
+      <div class="section-label">💖 happiness:</div>
+      <div class="progress-container" style="margin-bottom:10px;">
+        <div class="progress-fill" id="pb-happy" style="width:88%;background:linear-gradient(90deg,#006600,#88cc44);"><span class="progress-label" id="pl-happy">88%</span></div>
+      </div>
+      <div style="text-align:right;">
+        <button class="win-form-btn" onclick="openStatsModal()" style="font-size:6px;">🔒 owner edit</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="currently" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📖</span><span>Currently...</span></div>
+    </div>
+    <div class="win-content">
+      <div class="raised-box" style="margin-bottom:6px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">📺 WATCHING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-watching">Ask Me Anything</div>
+      </div>
+      <div class="raised-box" style="margin-bottom:6px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">📖 READING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-reading">a manhwa probably</div>
+      </div>
+      <div class="raised-box" style="margin-bottom:6px;">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">🎵 LISTENING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-listening">kpop on shuffle ♪</div>
+      </div>
+      <div class="raised-box">
+        <div style="font-family:var(--pixel-font);font-size:7px;color:#555;margin-bottom:3px;">😴 FEELING:</div>
+        <div style="font-family:var(--vt-font);font-size:18px;" id="curr-feeling">sleepy as always</div>
+      </div>
+      <div style="text-align:right;margin-top:6px;">
+        <button class="win-form-btn" onclick="openCurrentlyModal()" style="font-size:6px;">🔒 owner edit</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="guestbook" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>📬</span><span>Guestbook</span></div>
+    </div>
+    <div class="win-content">
+      <div class="section-label">💌 visitor messages:</div>
+      <div class="gb-list" id="gbList"></div>
+      <hr class="pixel-hr">
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:4px;color:#555;">LEAVE A MESSAGE:</div>
+      <input class="win-form-input" id="gbName" type="text" placeholder="your name..." style="margin-bottom:4px;" maxlength="30"/>
+      <textarea class="win-form-input" id="gbMsg" placeholder="say hi!! 🌸" style="height:52px;resize:none;margin-bottom:6px;" maxlength="200"></textarea>
+      <button class="win-form-btn primary" onclick="submitGuestbook()">📨 Sign!</button>
+    </div>
+    <div class="win-statusbar">
+      <div class="statusbar-panel" id="gbCount">0 messages</div>
+    </div>
+  </div>
+
+  <div id="links" class="win-window">
+    <div class="win-titlebar">
+      <div class="win-titlebar-left"><span>🔗</span><span>Cool Links</span></div>
+    </div>
+    <div class="win-content">
+      <div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:6px;color:var(--win-title);">★ EXPLORE THE SMALL WEB:</div>
+      <div class="tree-item"><span>🌐</span><a href="https://neocities.org" target="_blank">neocities.org</a></div>
+      <div class="tree-item"><span>🖥️</span><a href="https://windows93.net" target="_blank">windows93.net</a></div>
+      <div class="tree-item"><span>🖥️</span><a href="https://oldcomputers.net" target="_blank">oldcomputers.net</a></div>
+      <div class="tree-item"><span>💾</span><a href="https://bongo.cat" target="_blank">bongo.cat</a></div>
+      <div class="tree-item"><span>💾</span><a href="https://lofi.town" target="_blank">lofi.town</a></div>
+      <div class="tree-item"><span>🌿</span><span style="color:#808080;">my friend's site (soon)</span></div>
+    </div>
+  </div>
+</div>
+</div><div class="taskbar">
+  <button class="start-btn" onclick="scrollTo('#home')"><span>🥑</span><strong>Start</strong></button>
+  <div class="tbdiv"></div>
+  <button class="taskbar-btn" onclick="scrollTo('#about')">🥑 About</button>
+  <button class="taskbar-btn" onclick="scrollTo('#music')">🎵 Music</button>
+  <button class="taskbar-btn" onclick="scrollTo('#guestbook')">📬 Guestbook</button>
+  <button class="taskbar-btn" onclick="scrollTo('#stats')">📊 Stats</button>
+  <div class="tbdiv"></div>
+  <div style="display:flex;align-items:center;gap:4px;font-size:12px;">🔊💻🌐</div>
+  <div class="clock-area" id="clockDisplay">--:-- --</div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
