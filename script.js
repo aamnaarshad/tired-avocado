@@ -172,20 +172,40 @@ async function openStatsModal() {
 
   try {
     const rows = await db.select('owner_stats', '?select=mood,caffeine,drama,sleep,happy&order=created_at.desc&limit=1');
-    const s = (rows && rows[0]) || defaultStats; // FIX: rows[0]
+    const s = (rows && rows[0]) || defaultStats;
+
+    const container = document.getElementById('statsModalContent');
+    container.innerHTML = '';
+
+    // ── Mood section ──
+    const moodWrap = document.createElement('div');
+    moodWrap.style.marginBottom = '8px';
+
+    const moodLabel = document.createElement('div');
+    moodLabel.style.cssText = 'font-family:var(--pixel-font);font-size:7px;color:var(--win-title);margin-bottom:6px;';
+    moodLabel.textContent = 'MOOD:';
+    moodWrap.appendChild(moodLabel);
+
+    const moodSel = document.createElement('div');
+    moodSel.className = 'mood-selector';
+    moodSel.id = 'moodSel';
 
     const moods = ['😊','😄','😎','🥰','😴','😤','🥺','😂','🤔','✨','🥑','💖'];
     const selected = s.mood || '😊';
-
-    let html = '<div style="margin-bottom:8px;">' +
-               '<div style="font-family:var(--pixel-font);font-size:7px;color:var(--win-title);margin-bottom:6px;">MOOD:</div>' +
-               '<div class="mood-selector" id="moodSel">';
-
     moods.forEach(function(m) {
-      html += '<div class="mood-opt' + (m === selected ? ' selected' : '') + '" onclick="selectMood(this,\'' + m + '\')">' + m + '</div>';
+      const opt = document.createElement('div');
+      opt.className = 'mood-opt' + (m === selected ? ' selected' : '');
+      opt.textContent = m;
+      opt.addEventListener('click', function() {
+        moodSel.querySelectorAll('.mood-opt').forEach(function(o) { o.classList.remove('selected'); });
+        opt.classList.add('selected');
+      });
+      moodSel.appendChild(opt);
     });
-    html += '</div></div>';
+    moodWrap.appendChild(moodSel);
+    container.appendChild(moodWrap);
 
+    // ── Stat sliders ──
     const rowsConfig = [
       ['caffeine', '☕ Caffeine %'],
       ['drama',    '📺 Drama Obsession %'],
@@ -194,18 +214,54 @@ async function openStatsModal() {
     ];
 
     rowsConfig.forEach(function(r) {
-      const key = r[0]; // FIX: use r[0] as the key, not r (which is the whole array)
+      const key = r[0];
       const val = s[key] !== undefined ? s[key] : defaultStats[key];
-      html += '<div class="stat-row"><label>' + r[1] + '</label>' +
-              '<input type="range" min="0" max="100" value="' + val + '" oninput="document.getElementById(\'rv-' + key + '\').textContent=this.value+\'%\'" id="sr-' + key + '" />' +
-              '<span class="val" id="rv-' + key + '">' + val + '%</span></div>';
+
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+
+      const lbl = document.createElement('label');
+      lbl.textContent = r[1];
+      row.appendChild(lbl);
+
+      const span = document.createElement('span');
+      span.className = 'val';
+      span.id = 'rv-' + key;
+      span.textContent = val + '%';
+
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.min = '0';
+      input.max = '100';
+      input.value = val;
+      input.id = 'sr-' + key;
+      input.addEventListener('input', function() {
+        span.textContent = input.value + '%';
+      });
+
+      row.appendChild(input);
+      row.appendChild(span);
+      container.appendChild(row);
     });
 
-    html += '<div style="margin-top:10px;display:flex;gap:6px;justify-content:flex-end;">' +
-            '<button class="win-form-btn" onclick="closeStatsModal()">Cancel</button>' +
-            '<button class="win-form-btn primary" onclick="saveStats()">💾 Save</button></div>';
+    // ── Buttons ──
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'margin-top:10px;display:flex;gap:6px;justify-content:flex-end;';
 
-    document.getElementById('statsModalContent').innerHTML = html;
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'win-form-btn';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', closeStatsModal);
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'win-form-btn primary';
+    saveBtn.textContent = '💾 Save';
+    saveBtn.addEventListener('click', saveStats);
+
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(saveBtn);
+    container.appendChild(btnRow);
+
     document.getElementById('statsModal').classList.remove('hidden');
   } catch(e) {
     console.error('Modal init error:', e);
@@ -213,11 +269,9 @@ async function openStatsModal() {
   }
 }
 
-function selectMood(el, m) {
-  document.querySelectorAll('.mood-opt').forEach(function(o) { o.classList.remove('selected'); });
-  el.classList.add('selected');
-  el.parentElement.setAttribute('data-value', m);
-}
+// selectMood is no longer needed (logic is inline in the event listener above),
+// but kept as a no-op in case it's referenced anywhere in HTML.
+function selectMood() {}
 
 async function saveStats() {
   const moodEl = document.querySelector('.mood-opt.selected');
@@ -246,7 +300,15 @@ async function openCurrentlyModal() {
 
   try {
     const rows = await db.select('owner_currently', '?select=watching,reading,listening,feeling&order=created_at.desc&limit=1');
-    const c = (rows && rows[0]) || {}; // FIX: rows[0]
+    const c = (rows && rows[0]) || {};
+
+    const container = document.getElementById('statsModalContent');
+    container.innerHTML = '';
+
+    const title = document.createElement('div');
+    title.style.cssText = 'font-family:var(--pixel-font);font-size:7px;margin-bottom:8px;color:var(--win-title);';
+    title.textContent = 'UPDATE CURRENTLY:';
+    container.appendChild(title);
 
     const fields = [
       ['watching',  '📺 Watching'],
@@ -255,20 +317,47 @@ async function openCurrentlyModal() {
       ['feeling',   '😴 Feeling']
     ];
 
-    let html = '<div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:8px;color:var(--win-title);">UPDATE CURRENTLY:</div>';
-
     fields.forEach(function(f) {
-      const key = f[0]; // FIX: use f[0] as the key, not f (which is the whole array)
+      const key = f[0];
       const val = c[key] || '';
-      html += '<div style="margin-bottom:6px;"><div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:3px;color:#555;">' + f[1] + ':</div>' +
-              '<input class="win-form-input" id="curr-edit-' + key + '" type="text" value="' + escHtml(val) + '" placeholder="..." /></div>';
+
+      const wrap = document.createElement('div');
+      wrap.style.marginBottom = '6px';
+
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-family:var(--pixel-font);font-size:7px;margin-bottom:3px;color:#555;';
+      lbl.textContent = f[1] + ':';
+
+      const input = document.createElement('input');
+      input.className = 'win-form-input';
+      input.id = 'curr-edit-' + key;
+      input.type = 'text';
+      input.value = val;
+      input.placeholder = '...';
+
+      wrap.appendChild(lbl);
+      wrap.appendChild(input);
+      container.appendChild(wrap);
     });
 
-    html += '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:10px;">' +
-            '<button class="win-form-btn" onclick="closeStatsModal()">Cancel</button>' +
-            '<button class="win-form-btn primary" onclick="saveCurrently()">💾 Save</button></div>';
+    // ── Buttons ──
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:6px;justify-content:flex-end;margin-top:10px;';
 
-    document.getElementById('statsModalContent').innerHTML = html;
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'win-form-btn';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', closeStatsModal);
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'win-form-btn primary';
+    saveBtn.textContent = '💾 Save';
+    saveBtn.addEventListener('click', saveCurrently);
+
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(saveBtn);
+    container.appendChild(btnRow);
+
     document.getElementById('statsModal').classList.remove('hidden');
   } catch(e) {
     console.error('Currently edit modal error:', e);
