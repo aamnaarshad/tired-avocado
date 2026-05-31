@@ -3,7 +3,6 @@
 // ═══════════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://uerryqabhgteigdzwfhi.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlcnJ5cWFiaGd0ZWlnZHp3ZmhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTgzNDEsImV4cCI6MjA5NTY3NDM0MX0.qs1vbHAvk8vdc5kNice5t9TQV_YsoBQ0TqqkIOc6Y0c';
-const OWNER_PASS    = 'avocadomin';   
 
 // ── Tiny Supabase REST helper ────────────────────────────────────
 const db = {
@@ -44,13 +43,13 @@ async function initVisitor() {
   try {
     const counted = sessionStorage.getItem('avo_counted');
     let count;
-    
+
     if (!counted) {
       count = await db.rpc('increment_visitor');
       sessionStorage.setItem('avo_counted', '1');
     } else {
       const rows = await db.select('site_stats', '?select=visitor_count&limit=1');
-      count = rows ? rows.visitor_count : '??';
+      count = (rows && rows[0]) ? rows[0].visitor_count : '??'; // FIX: rows[0]
     }
 
     const countStr = Number(count).toLocaleString();
@@ -76,7 +75,7 @@ async function loadGuestbook() {
       entries.forEach(function(e) {
         const div = document.createElement('div');
         div.className = 'gb-entry';
-        div.innerHTML = 
+        div.innerHTML =
           '<div class="gb-name"><span>💬 ' + escHtml(e.name) + '</span>' +
           '<span class="gb-date">' + formatDate(e.created_at) + '</span></div>' +
           '<div class="gb-msg">' + escHtml(e.message) + '</div>';
@@ -94,7 +93,7 @@ async function submitGuestbook() {
   const name = document.getElementById('gbName').value.trim();
   const msg  = document.getElementById('gbMsg').value.trim();
 
-  if (!name) { showToast('please enter your name!! 🌸'); return; }
+  if (!name) { showToast('please enter your name!!'); return; }
   if (!msg)  { showToast('please write a message!! 💌'); return; }
 
   const btn = document.querySelector('#guestbook .win-form-btn.primary');
@@ -117,12 +116,12 @@ async function submitGuestbook() {
 }
 
 // ── Load & Render Stats ──────────────────────────────────────────
-const defaultStats = { mood: '😊', caffeine: 70, drama: 95, sleep: 80, happy: 88 };
+const defaultStats = { mood: '😊', caffeine: 0, drama: 0, sleep: 0, happy: 0 };
 
 async function loadStats() {
   try {
     const rows = await db.select('owner_stats', '?select=mood,caffeine,drama,sleep,happy&order=created_at.desc&limit=1');
-    const current = rows || defaultStats;
+    const current = (rows && rows[0]) || defaultStats; // FIX: rows[0]
 
     document.getElementById('moodDisplay').textContent = current.mood || defaultStats.mood;
     setBar('caffeine', current.caffeine !== undefined ? current.caffeine : defaultStats.caffeine);
@@ -154,7 +153,7 @@ function setBar(id, val) {
 async function loadCurrently() {
   try {
     const rows = await db.select('owner_currently', '?select=watching,reading,listening,feeling&order=created_at.desc&limit=1');
-    const current = rows || {};
+    const current = (rows && rows[0]) || {}; // FIX: rows[0]
 
     if (current.watching)  document.getElementById('curr-watching').textContent  = current.watching;
     if (current.reading)   document.getElementById('curr-reading').textContent   = current.reading;
@@ -163,137 +162,6 @@ async function loadCurrently() {
   } catch(e) {
     console.error('Currently load error:', e);
   }
-}
-
-// ── Owner Modals and Form Updates ────────────────────────────────
-async function openStatsModal() {
-  const pw = prompt('🔒 owner password:');
-  if (!pw || pw !== OWNER_PASS) { if (pw !== null) showToast('wrong password!! 🔒'); return; }
-
-  try {
-    const rows = await db.select('owner_stats', '?select=mood,caffeine,drama,sleep,happy&order=created_at.desc&limit=1');
-    const s = rows || defaultStats;
-
-    const moods = ['😊','😄','😎','🥰','😴','😤','🥺','😂','🤔','✨','🥑','💖'];
-    const selected = s.mood || '😊';
-
-    let html = '<div style="margin-bottom:8px;">' +
-               '<div style="font-family:var(--pixel-font);font-size:7px;color:var(--win-title);margin-bottom:6px;">MOOD:</div>' +
-               '<div class="mood-selector" id="moodSel">';
-    
-    moods.forEach(function(m) {
-      html += '<div class="mood-opt' + (m === selected ? ' selected' : '') + '" onclick="selectMood(this,\'' + m + '\')">' + m + '</div>';
-    });
-    html += '</div></div>';
-
-    const rowsConfig = [
-      ['caffeine', '☕ Caffeine %'],
-      ['drama',    '📺 Drama Obsession %'],
-      ['sleep',    '😴 Sleepiness %'],
-      ['happy',    '💖 Happiness %']
-    ];
-
-    rowsConfig.forEach(function(r) {
-      const val = s[r] !== undefined ? s[r] : defaultStats[r];
-      html += '<div class="stat-row"><label>' + r + '</label>' +
-              '<input type="range" min="0" max="100" value="' + val + '" oninput="document.getElementById(\'rv-' + r + '\').textContent=this.value+\'%\'" id="sr-' + r + '" />' +
-              '<span class="val" id="rv-' + r + '">' + val + '%</span></div>';
-    });
-
-    html += '<div style="margin-top:10px;display:flex;gap:6px;justify-content:flex-end;">' +
-            '<button class="win-form-btn" onclick="closeStatsModal()">Cancel</button>' +
-            '<button class="win-form-btn primary" onclick="saveStats()">💾 Save</button></div>';
-
-    document.getElementById('statsModalContent').innerHTML = html;
-    document.getElementById('statsModal').classList.remove('hidden');
-  } catch(e) {
-    console.error('Modal init error:', e);
-    showToast('error reading current state');
-  }
-}
-
-function selectMood(el, m) {
-  document.querySelectorAll('.mood-opt').forEach(function(o) { o.classList.remove('selected'); });
-  el.classList.add('selected');
-  el.parentElement.setAttribute('data-value', m);
-}
-
-async function saveStats() {
-  const moodEl = document.querySelector('.mood-opt.selected');
-  const s = {
-    mood: moodEl ? moodEl.textContent : '😊',
-    caffeine: parseInt(document.getElementById('sr-caffeine').value),
-    drama:    parseInt(document.getElementById('sr-drama').value),
-    sleep:    parseInt(document.getElementById('sr-sleep').value),
-    happy:    parseInt(document.getElementById('sr-happy').value)
-  };
-
-  try {
-    await db.insert('owner_stats', s);
-    await loadStats();
-    closeStatsModal();
-    showToast('stats updated!! 📊');
-  } catch(e) {
-    console.error('Save stats error:', e);
-    showToast('save failed 😔 check console');
-  }
-}
-
-async function openCurrentlyModal() {
-  const pw = prompt('🔒 owner password:');
-  if (!pw || pw !== OWNER_PASS) { if (pw !== null) showToast('wrong password!! 🔒'); return; }
-
-  try {
-    const rows = await db.select('owner_currently', '?select=watching,reading,listening,feeling&order=created_at.desc&limit=1');
-    const c = rows || {};
-
-    const fields = [
-      ['watching',  '📺 Watching'],
-      ['reading',   '📖 Reading'],
-      ['listening', '🎵 Listening'],
-      ['feeling',   '😴 Feeling']
-    ];
-
-    let html = '<div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:8px;color:var(--win-title);">UPDATE CURRENTLY:</div>';
-    
-    fields.forEach(function(f) {
-      const val = c[f] || '';
-      html += '<div style="margin-bottom:6px;"><div style="font-family:var(--pixel-font);font-size:7px;margin-bottom:3px;color:#555;">' + f + ':</div>' +
-              '<input class="win-form-input" id="curr-edit-' + f + '" type="text" value="' + escHtml(val) + '" placeholder="..." /></div>';
-    });
-
-    html += '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:10px;">' +
-            '<button class="win-form-btn" onclick="closeStatsModal()">Cancel</button>' +
-            '<button class="win-form-btn primary" onclick="saveCurrently()">💾 Save</button></div>';
-
-    document.getElementById('statsModalContent').innerHTML = html;
-    document.getElementById('statsModal').classList.remove('hidden');
-  } catch(e) {
-    console.error('Currently edit modal error:', e);
-  }
-}
-
-async function saveCurrently() {
-  const c = {
-    watching:  document.getElementById('curr-edit-watching').value.trim(),
-    reading:   document.getElementById('curr-edit-reading').value.trim(),
-    listening: document.getElementById('curr-edit-listening').value.trim(),
-    feeling:   document.getElementById('curr-edit-feeling').value.trim()
-  };
-
-  try {
-    await db.insert('owner_currently', c);
-    await loadCurrently();
-    closeStatsModal();
-    showToast('updated!! ✨');
-  } catch(e) {
-    console.error('Save currently error:', e);
-    showToast('save failed 😔 check console');
-  }
-}
-
-function closeStatsModal() {
-  document.getElementById('statsModal').classList.add('hidden');
 }
 
 // ── Original Utility Helpers ─────────────────────────────────────
@@ -311,8 +179,8 @@ function showToast(msg) {
 
 function formatDate(d) {
   const date = new Date(d);
-  return (date.getMonth() + 1).toString().padStart(2, '0') + '.' + 
-         date.getDate().toString().padStart(2, '0') + '.' + 
+  return (date.getMonth() + 1).toString().padStart(2, '0') + '.' +
+         date.getDate().toString().padStart(2, '0') + '.' +
          String(date.getFullYear()).slice(2);
 }
 
@@ -337,7 +205,8 @@ function scrollTo(id) {
 // ── EQ bars ──────────────────────────────────────────────────────
 const eqC = document.getElementById('eqBars');
 if (eqC) {
- .forEach(function(h, i) {
+  const heights = [8, 14, 6, 12, 10, 4, 16, 8, 12];
+  heights.forEach(function(h, i) {
     const b = document.createElement('div');
     b.className = 'eq-bar';
     b.style.setProperty('--h', h + 'px');
@@ -349,13 +218,14 @@ if (eqC) {
 
 // ── Music player ─────────────────────────────────────────────────
 const tracks = [
-  '🎵 kpop playlist — shuffle mode',
-  '🎵 IVE — After LIKE',
-  '🎵 aespa — Supernova',
-  '🎵 NewJeans — Hype Boy',
-  '🎵 BLACKPINK — How You Like That',
-  '🎵 LE SSERAFIM — FEARLESS',
-  '🎵 EXO — Love Shot',
+  'playlist — shuffle mode',
+  '🎵 Stray Kids - Neverending Story',
+  '🎵 우기(YUQI) - Radio (Dum-Dum)',
+  '🎵 aespa - Supernova',
+  '🎵 Saja Boys - Your Idol',
+  '🎵 IVE 아이브 - I AM',
+  '🎵 EVERGLOW (에버글로우) - DUN DUN',
+  '🎵 ONEUS(원어스) - Same Scent',
   '🎵 BTS — Dynamite',
 ];
 let trackIdx = 0;
@@ -380,6 +250,13 @@ function prevTrack() { trackIdx = (trackIdx - 1 + tracks.length) % tracks.length
 function stopTrack() { trackIdx = 0; updateTrack(); }
 function togglePlay() { /* cosmetic placeholder */ }
 
+// ── Music player buttons ─────────────────────────────────────────
+document.getElementById('btnPrev').addEventListener('click', prevTrack);
+document.getElementById('btnStop').addEventListener('click', stopTrack);
+document.getElementById('playBtn').addEventListener('click', togglePlay);
+document.getElementById('btnPause').addEventListener('click', togglePlay);
+document.getElementById('btnNext').addEventListener('click', nextTrack);
+
 // ── Interest Cards Hook ─────────────────────────────────────────
 const interestLabels = {
   'K-DRAMA': 'you have excellent taste in kdramas 🎬',
@@ -398,6 +275,23 @@ document.querySelectorAll('.interest-card').forEach(function(card) {
     const label = card.querySelector('.ic-label').textContent.trim();
     const msg = interestLabels[label] || 'shrine coming soon!! 🌸';
     showToast(msg);
+  });
+});
+
+// ── Welcome dialog ───────────────────────────────────────────────
+function closeWelcome() {
+  document.getElementById('welcomeDialog').classList.add('hidden');
+}
+document.getElementById('welcomeCloseX').addEventListener('click', closeWelcome);
+document.getElementById('welcomeCloseOk').addEventListener('click', closeWelcome);
+
+// ── Guestbook submit ─────────────────────────────────────────────
+document.getElementById('btnSubmitGuestbook').addEventListener('click', submitGuestbook);
+
+// ── data-scroll: universal scroll delegation ─────────────────────
+document.querySelectorAll('[data-scroll]').forEach(function(el) {
+  el.addEventListener('click', function() {
+    scrollTo(el.getAttribute('data-scroll'));
   });
 });
 

@@ -48,7 +48,7 @@ body{
 .marquee-inner{display:inline-block;animation:marquee 20s linear infinite;font-family:var(--vt-font);font-size:18px;color:var(--accent-lime);text-shadow:0 0 8px var(--accent-lime);padding-left:100%;}
 @keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
 /* LAYOUT */
-.page-layout{margin-left:90px;display:grid;grid-template-columns:220px 1fr 220px;gap:8px;max-width:1200px;}
+.page-layout{margin-left:90px;display:grid;grid-template-columns:280px 2fr 1fr;gap:8px;max-width:1200px;}
 .header-window{margin-left:90px;margin-bottom:8px;}
 /* HEADER */
 .header-content{background:#0a1a08;padding:12px;text-align:center;border:2px inset var(--win-dark);position:relative;overflow:hidden;}
