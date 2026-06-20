@@ -99,7 +99,7 @@ body{
 .interest-card .ic-ico{font-size:20px;display:block;}
 .interest-card .ic-label{font-family:var(--pixel-font);font-size:6px;margin-top:3px;display:block;line-height:1.4;}
 /* GUESTBOOK */
-.gb-list{max-height:220px;overflow-y:auto;margin-bottom:8px;}
+.gb-list{max-height:420px;overflow-y:auto;margin-bottom:8px;}
 .gb-entry{background:white;border:2px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);padding:6px;margin-bottom:5px;}
 .gb-name{font-family:var(--pixel-font);font-size:7px;color:var(--win-title);display:flex;align-items:center;gap:4px;}
 .gb-date{font-family:var(--pixel-font);font-size:6px;color:#888;margin-left:auto;}
