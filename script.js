@@ -116,18 +116,18 @@ async function submitGuestbook() {
 }
 
 // ── Load & Render Stats ──────────────────────────────────────────
-const defaultStats = { mood: '😊', caffeine: 0, drama: 0, sleep: 0, happy: 0 };
+const defaultStats = { mood: '😊', social_battery: 0, motivation: 0, sleep: 0, happy: 0 };
 
 async function loadStats() {
   try {
-    const rows = await db.select('owner_stats', '?select=mood,caffeine,drama,sleep,happy&order=created_at.desc&limit=1');
+    const rows = await db.select('owner_stats', '?select=mood,social_battery,motivation,sleep,happy&order=created_at.desc&limit=1');
     const current = (rows && rows[0]) || defaultStats; // FIX: rows[0]
 
     document.getElementById('moodDisplay').textContent = current.mood || defaultStats.mood;
-    setBar('caffeine', current.caffeine !== undefined ? current.caffeine : defaultStats.caffeine);
-    setBar('drama',    current.drama    !== undefined ? current.drama    : defaultStats.drama);
-    setBar('sleep',    current.sleep    !== undefined ? current.sleep    : defaultStats.sleep);
-    setBar('happy',    current.happy    !== undefined ? current.happy    : defaultStats.happy);
+    setBar('social_battery', current.social_battery !== undefined ? current.social_battery : defaultStats.social_battery);
+    setBar('motivation',     current.motivation      !== undefined ? current.motivation      : defaultStats.motivation);
+    setBar('sleep',          current.sleep           !== undefined ? current.sleep           : defaultStats.sleep);
+    setBar('happy',          current.happy           !== undefined ? current.happy           : defaultStats.happy);
   } catch(e) {
     console.error('Stats load error:', e);
     renderDefaultStats();
@@ -136,8 +136,8 @@ async function loadStats() {
 
 function renderDefaultStats() {
   document.getElementById('moodDisplay').textContent = defaultStats.mood;
-  setBar('caffeine', defaultStats.caffeine);
-  setBar('drama', defaultStats.drama);
+  setBar('social_battery', defaultStats.social_battery);
+  setBar('motivation', defaultStats.motivation);
   setBar('sleep', defaultStats.sleep);
   setBar('happy', defaultStats.happy);
 }
